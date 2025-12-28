@@ -23,7 +23,7 @@
 - Write tests for new functionality
 - Use Zod for runtime validation (both input AND output schemas)
 - Always read files before modifying them
-- Never introduce security vulnerabilities (SQL injection, XSS, etc.)
+- Follow Security Practices (see Best Practices section)
 
 ### Testing
 - Unit tests: `npm run test` (Vitest)
@@ -150,6 +150,96 @@
 - Server errors: Technical details for debugging
 - Client toasts: User-friendly actionable messages
 - Never expose sensitive data in error messages
+
+### Security Practices
+
+#### Input Validation
+- Define Zod schemas for ALL user inputs at API boundaries
+- Use `.input()` validation in all tRPC procedures
+- Validate on server side; client-side validation is for UX only
+- Example:
+  ```typescript
+  const CreateUserInputSchema = z.object({
+    email: z.string().email(),
+    name: z.string().min(1).max(100),
+  });
+
+  createUser: protectedProcedure
+    .input(CreateUserInputSchema)
+    .mutation(async ({ input, ctx }) => { /* ... */ })
+  ```
+
+#### Database Security
+- Use Prisma's query builder for all database operations
+- Enable Row Level Security (RLS) policies in Supabase
+- Use `SECURITY DEFINER` functions for system operations that need RLS bypass
+- Example:
+  ```typescript
+  // Prisma automatically parameterizes queries
+  await prisma.user.findMany({
+    where: { email: userEmail }
+  });
+  ```
+
+#### Output Encoding
+- Render user content using React's JSX (automatic escaping)
+- Use `encodeURIComponent()` for user data in URL parameters
+- Example:
+  ```typescript
+  // React automatically escapes user input
+  <div>{userInput}</div>
+  <p>{post.content}</p>
+
+  // URL encoding
+  <Link href={`/search?q=${encodeURIComponent(searchQuery)}`}>
+  ```
+
+#### Authentication & Authorization
+- Validate sessions using NextAuth.js in tRPC context
+- Enforce authorization at API level with `protectedProcedure`
+- Check user permissions for every protected operation
+- Example:
+  ```typescript
+  deletePost: protectedProcedure
+    .input(z.object({ postId: z.string() }))
+    .mutation(async ({ input, ctx }) => {
+      const post = await ctx.db.post.findUnique({
+        where: { id: input.postId }
+      });
+
+      // Verify ownership
+      if (post.authorId !== ctx.session.user.id) {
+        throw new TRPCError({ code: 'FORBIDDEN' });
+      }
+
+      return ctx.db.post.delete({ where: { id: input.postId } });
+    })
+  ```
+
+#### Environment Variables & Secrets
+- Store secrets in `.env.local` for development (gitignored)
+- Validate required environment variables at startup using Zod
+- Use Vercel environment variables for production
+- Example:
+  ```typescript
+  // env.ts
+  const envSchema = z.object({
+    DATABASE_URL: z.string().url(),
+    NEXTAUTH_SECRET: z.string().min(32),
+  });
+
+  export const env = envSchema.parse(process.env);
+  ```
+
+#### Security Review Process
+- Run `security-sentinel` agent before merging PRs with user input handling
+- Run `data-integrity-guardian` agent for database changes
+- Use security review agents especially when:
+  - Handling user-generated content
+  - Processing file uploads
+  - Constructing dynamic queries
+  - Implementing authentication/authorization
+  - Modifying payment or sensitive data flows
 
 ## Project Structure
 
