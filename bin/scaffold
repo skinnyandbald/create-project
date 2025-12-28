@@ -18,7 +18,14 @@ while [ -L "$SCRIPT_PATH" ]; do
 done
 SCRIPT_DIR="$(cd -P "$(dirname "$SCRIPT_PATH")" && pwd)"
 SCAFFOLDS_DIR="$(dirname "$SCRIPT_DIR")/scaffolds"
-PROJECT_DIR="${HOME}/code"
+
+# Load config for PROJECT_DIR
+CONFIG_FILE="$HOME/.config/scaffold/config"
+if [ -f "$CONFIG_FILE" ]; then
+    # shellcheck source=/dev/null
+    source "$CONFIG_FILE"
+fi
+PROJECT_DIR="${PROJECT_DIR:-$HOME/code}"
 
 # Helper functions
 print_header() {
@@ -41,6 +48,45 @@ print_error() {
 
 print_success() {
     echo -e "${GREEN}✓${NC} $1"
+}
+
+# Validate project name (alphanumeric and hyphens only)
+validate_project_name() {
+    local name="$1"
+
+    # Must be lowercase alphanumeric with hyphens, start/end with alphanumeric
+    if [[ ${#name} -eq 1 ]]; then
+        if [[ ! "$name" =~ ^[a-z0-9]$ ]]; then
+            print_error "Project name must be lowercase alphanumeric"
+            exit 1
+        fi
+    elif [[ ! "$name" =~ ^[a-z0-9][a-z0-9-]*[a-z0-9]$ ]]; then
+        print_error "Project name must be lowercase alphanumeric with hyphens"
+        print_error "Must start and end with a letter or number"
+        exit 1
+    fi
+
+    if [[ ${#name} -gt 64 ]]; then
+        print_error "Project name must be 64 characters or less"
+        exit 1
+    fi
+}
+
+# Validate project path is within PROJECT_DIR
+validate_project_path() {
+    local project_path="$1"
+
+    # Resolve to absolute path and check it's within PROJECT_DIR
+    local resolved_parent
+    resolved_parent="$(cd "$(dirname "$project_path")" 2>/dev/null && pwd)" || {
+        print_error "Invalid project path"
+        exit 1
+    }
+
+    if [[ "$resolved_parent" != "$PROJECT_DIR" ]]; then
+        print_error "Project must be created in $PROJECT_DIR"
+        exit 1
+    fi
 }
 
 # Prompt for input with default
@@ -352,7 +398,10 @@ main() {
         exit 1
     fi
 
+    validate_project_name "$project_name"
+
     local project_path="$PROJECT_DIR/$project_name"
+    validate_project_path "$project_path"
 
     # Handle upgrade mode
     if $upgrade_mode; then

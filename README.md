@@ -16,6 +16,8 @@ git clone git@github.com:YOUR_USERNAME/create-project.git
 ```
 
 This will:
+- Prompt for your projects directory (default: `~/code`)
+- Save configuration to `~/.config/scaffold/config`
 - Symlink `scaffold` to your PATH
 - Symlink the `/create-project` skill to `~/.claude/commands/`
 
@@ -81,12 +83,20 @@ In any Claude Code session:
 - Minimal setup until stack is chosen
 - Upgrade path to T3 or Laravel
 
+## Configuration
+
+User configuration is stored in `~/.config/scaffold/config`:
+```bash
+PROJECT_DIR="/your/projects/path"
+```
+
+Re-run `./setup.sh` to change the projects directory.
+
 ## Customization
 
 Templates are in `scaffolds/`:
 ```
 scaffolds/
-├── config.json       # Global settings
 ├── t3/               # T3 templates
 ├── laravel/          # Laravel templates
 └── discovery/        # Discovery templates

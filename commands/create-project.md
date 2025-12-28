@@ -45,7 +45,7 @@ Once you know the project name and type, run:
 ```
 
 The script will:
-- Create the project in ~/code/<project-name>
+- Create the project in the configured projects directory (default: ~/code)
 - Install dependencies
 - Set up Claude Code (CLAUDE.md, commands, MCP servers)
 - Set up DevOps (CodeRabbit, GitHub workflows)
@@ -55,7 +55,7 @@ The script will:
 ## After Scaffolding
 
 Let the user know:
-- Where the project is: `cd ~/code/<project-name>`
+- Where the project is (check the scaffold output for the exact path)
 - Key files: CLAUDE.md, .coderabbit.yaml
 - Next steps based on stack
 
