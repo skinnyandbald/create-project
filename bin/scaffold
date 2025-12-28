@@ -127,9 +127,10 @@ select_option() {
     shift
     local options=("$@")
 
-    echo -e "\n${BLUE}$prompt_text${NC}"
+    # Print menu to stderr so it displays when output is captured
+    echo -e "\n${BLUE}$prompt_text${NC}" >&2
     for i in "${!options[@]}"; do
-        echo "  $((i+1))) ${options[$i]}"
+        echo "  $((i+1))) ${options[$i]}" >&2
     done
 
     local selection
@@ -139,7 +140,7 @@ select_option() {
             echo "${options[$((selection-1))]}"
             return
         fi
-        echo "Invalid selection"
+        echo "Invalid selection" >&2
     done
 }
 
