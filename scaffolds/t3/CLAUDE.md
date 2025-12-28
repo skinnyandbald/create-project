@@ -6,8 +6,9 @@
 - **Language:** TypeScript (strict mode)
 - **Styling:** Tailwind CSS
 - **API:** tRPC
-- **Database:** Prisma ORM
-- **Auth:** NextAuth.js
+- **Database:** {{DATABASE}} (e.g., Supabase, PlanetScale)
+- **ORM:** Prisma
+- **Auth:** {{AUTH_PROVIDER}} (e.g., NextAuth.js, Supabase Auth, Clerk)
 - **Deployment:** Vercel
 
 ## Development Workflow
@@ -170,9 +171,10 @@
   ```
 
 #### Database Security
-- Use Prisma's query builder for all database operations
-- Enable Row Level Security (RLS) policies in Supabase
-- Use `SECURITY DEFINER` functions for system operations that need RLS bypass
+- Use Prisma's query builder for all database operations (automatic parameterization)
+- If using Supabase: Enable Row Level Security (RLS) policies
+- If using Supabase: Use `SECURITY DEFINER` functions for system operations that bypass RLS
+- Never concatenate user input into raw SQL queries
 - Example:
   ```typescript
   // Prisma automatically parameterizes queries
@@ -195,23 +197,26 @@
   ```
 
 #### Authentication & Authorization
-- Validate sessions using NextAuth.js in tRPC context
+- Validate user sessions in tRPC context (specific method depends on auth provider)
 - Enforce authorization at API level with `protectedProcedure`
 - Check user permissions for every protected operation
-- Example:
+- Verify resource ownership before mutations
+- Example pattern:
   ```typescript
   deletePost: protectedProcedure
     .input(z.object({ postId: z.string() }))
     .mutation(async ({ input, ctx }) => {
+      // Fetch resource
       const post = await ctx.db.post.findUnique({
         where: { id: input.postId }
       });
 
-      // Verify ownership
-      if (post.authorId !== ctx.session.user.id) {
+      // Verify ownership (ctx.user comes from auth provider)
+      if (post.authorId !== ctx.user.id) {
         throw new TRPCError({ code: 'FORBIDDEN' });
       }
 
+      // Perform mutation
       return ctx.db.post.delete({ where: { id: input.postId } });
     })
   ```
