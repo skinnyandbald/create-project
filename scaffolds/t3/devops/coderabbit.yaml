@@ -1,0 +1,98 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+
+language: en-US
+tone_instructions: chill
+early_access: true
+enable_free_tier: true
+
+reviews:
+  profile: chill
+  request_changes_workflow: false
+  high_level_summary: true
+  high_level_summary_placeholder: "@coderabbitai summary"
+  auto_title_placeholder: "@coderabbitai"
+  poem: false
+  review_status: true
+  collapse_walkthrough: false
+  sequence_diagrams: true
+  changed_files_summary: true
+
+  auto_review:
+    enabled: true
+    auto_incremental_review: true
+    ignore_title_keywords:
+      - "WIP"
+      - "DO NOT REVIEW"
+      - "[skip ci]"
+    drafts: false
+    base_branches:
+      - main
+
+  finishing_touches:
+    docstrings:
+      enabled: true
+    unit_tests:
+      enabled: false
+
+  tools:
+    oxc:
+      enabled: true
+    gitleaks:
+      enabled: true
+
+  path_filters:
+    - "!**/*.lock"
+    - "!**/package-lock.json"
+    - "!**/.next/**"
+    - "!**/node_modules/**"
+    - "!**/dist/**"
+    - "!**/.git/**"
+    - "!**/coverage/**"
+    - "!**/prisma/migrations/**"
+
+  path_instructions:
+    - path: "**/*.ts"
+      instructions: |
+        Focus on:
+        - Type safety and strict mode compliance
+        - Proper async/await error handling
+        - TypeScript best practices
+
+    - path: "src/app/**/*.tsx"
+      instructions: |
+        Focus on:
+        - Next.js App Router best practices
+        - Server vs Client Components usage
+        - Performance and accessibility
+
+    - path: "src/app/api/**"
+      instructions: |
+        Prioritize:
+        - Input validation with Zod
+        - Authentication checks
+        - Error handling and status codes
+        - Security vulnerabilities
+
+    - path: "prisma/schema.prisma"
+      instructions: |
+        Review:
+        - Schema changes for backward compatibility
+        - Index optimization
+        - Relationship definitions
+
+    - path: "**/*.test.ts"
+      instructions: |
+        Focus on:
+        - Test coverage completeness
+        - Test isolation and reliability
+        - Clear test descriptions
+
+chat:
+  auto_reply: true
+
+knowledge_base:
+  opt_out: false
+  web_search:
+    enabled: true
+  code_guidelines:
+    enabled: true

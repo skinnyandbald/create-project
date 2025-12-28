@@ -1,0 +1,40 @@
+{
+  "createT3App": {
+    "typescript": true,
+    "tailwind": true,
+    "trpc": true,
+    "prisma": true,
+    "nextAuth": true,
+    "appRouter": true
+  },
+  "uiKit": {
+    "packages": [
+      "lucide-react",
+      "class-variance-authority",
+      "clsx",
+      "tailwind-merge",
+      "sonner",
+      "next-themes",
+      "@radix-ui/react-slot",
+      "@radix-ui/react-tooltip"
+    ]
+  },
+  "testing": {
+    "packages": [
+      "vitest",
+      "@vitest/ui",
+      "@testing-library/react",
+      "@testing-library/jest-dom",
+      "@playwright/test"
+    ],
+    "devPackages": [
+      "husky",
+      "lint-staged",
+      "oxlint"
+    ]
+  },
+  "database": {
+    "default": "vercel-postgres",
+    "options": ["vercel-postgres", "planetscale", "supabase", "local-postgres"]
+  }
+}

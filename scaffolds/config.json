@@ -1,0 +1,21 @@
+{
+  "defaults": {
+    "projectDir": "~/code",
+    "githubUser": null,
+    "createGitHubRepo": "prompt"
+  },
+  "stacks": {
+    "t3": {
+      "description": "Next.js + TypeScript + Tailwind + tRPC + Prisma",
+      "deployment": "vercel"
+    },
+    "laravel": {
+      "description": "Laravel + Inertia + React",
+      "deployment": "laravel-cloud"
+    },
+    "discovery": {
+      "description": "Requirements gathering (no stack)",
+      "deployment": null
+    }
+  }
+}
