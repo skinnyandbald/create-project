@@ -176,7 +176,7 @@ scaffold_t3() {
         --trpc \
         --prisma \
         --nextAuth \
-        --dbProvider postgresql
+        --dbProvider postgres
 
     cd "$project_path"
 
@@ -305,14 +305,15 @@ upgrade_project() {
     local stack
     stack=$(select_option "Select stack:" "T3 (Next.js)" "Laravel")
 
-    # Backup requirements
-    print_step "Preserving requirements folder..."
-    local temp_requirements="/tmp/requirements-backup-$$"
-    if [ -d "$project_path/requirements" ]; then
-        cp -r "$project_path/requirements" "$temp_requirements"
-    fi
+    # Backup the ENTIRE project, not just requirements
+    print_step "Backing up existing project..."
+    local temp_backup="/tmp/project-backup-$$"
+    cp -r "$project_path" "$temp_backup"
 
-    # Remove old project (except requirements)
+    # Set up trap to restore on any failure
+    trap 'print_error "Upgrade failed! Restoring original project..."; rm -rf "$project_path"; cp -r "$temp_backup" "$project_path"; rm -rf "$temp_backup"; print_success "Original project restored."; exit 1' ERR
+
+    # Remove old project
     rm -rf "$project_path"
 
     # Create new project
@@ -325,12 +326,17 @@ upgrade_project() {
             ;;
     esac
 
-    # Restore requirements
-    if [ -d "$temp_requirements" ]; then
+    # Clear the trap now that scaffold succeeded
+    trap - ERR
+
+    # Restore requirements from backup
+    if [ -d "$temp_backup/requirements" ]; then
         print_step "Restoring requirements folder..."
-        cp -r "$temp_requirements" "$project_path/requirements"
-        rm -rf "$temp_requirements"
+        cp -r "$temp_backup/requirements" "$project_path/requirements"
     fi
+
+    # Cleanup backup
+    rm -rf "$temp_backup"
 
     print_success "Project upgraded!"
 }
