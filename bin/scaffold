@@ -357,10 +357,27 @@ init_git() {
 Created with create-project scaffold tool"
     fi
 
-    if confirm "Create private GitHub repository?"; then
+    local github_user
+    github_user=$(gh api user -q .login 2>/dev/null) || {
+        print_warning "Could not get GitHub user. Skipping remote setup."
+        return
+    }
+
+    local repo_url="https://github.com/$github_user/$project_name"
+
+    # Check if repo already exists on GitHub
+    if gh repo view "$github_user/$project_name" &>/dev/null; then
+        if confirm "GitHub repo exists. Push to $repo_url?"; then
+            print_step "Pushing to existing repository..."
+            git remote add origin "$repo_url.git" 2>/dev/null || git remote set-url origin "$repo_url.git"
+            git branch -M main
+            git push -u origin main --force
+            print_success "Pushed to: $repo_url"
+        fi
+    elif confirm "Create private GitHub repository?"; then
         print_step "Creating GitHub repository..."
         gh repo create "$project_name" --private --source=. --push
-        print_success "GitHub repository created: https://github.com/$(gh api user -q .login)/$project_name"
+        print_success "GitHub repository created: $repo_url"
     fi
 }
 
