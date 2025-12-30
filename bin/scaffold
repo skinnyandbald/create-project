@@ -186,7 +186,8 @@ scaffold_t3() {
 
     # Install testing packages
     print_step "Installing testing packages..."
-    npm install -D vitest @vitest/ui @testing-library/react @testing-library/jest-dom @playwright/test husky lint-staged oxlint
+    npm install -D vitest @vitest/ui @testing-library/react @testing-library/jest-dom @playwright/test husky lint-staged
+    npm install -D -E @biomejs/biome
 
     # Copy Claude setup
     print_step "Setting up Claude Code..."
@@ -204,6 +205,10 @@ scaffold_t3() {
     cp "$SCAFFOLDS_DIR/t3/devops/vercel.json" ./vercel.json
     cp "$SCAFFOLDS_DIR/t3/devops/workflows/"*.yml .github/workflows/
     cp "$SCAFFOLDS_DIR/t3/devops/PULL_REQUEST_TEMPLATE.md" .github/
+
+    # Copy Biome config
+    print_step "Setting up Biome..."
+    cp "$SCAFFOLDS_DIR/t3/extras/biome.json" ./biome.json
 
     # Initialize husky
     print_step "Setting up git hooks..."
