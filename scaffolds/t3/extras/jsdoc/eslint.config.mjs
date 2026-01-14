@@ -1,48 +1,88 @@
 /**
- * ESLint configuration for JSDoc enforcement only.
+ * ESLint configuration with JSDoc enforcement + Next.js rules.
  * Biome handles formatting and general linting.
- * This config enforces documentation presence on public APIs.
+ *
+ * This config enforces:
+ * 1. Next.js best practices (Core Web Vitals, image optimization, App Router)
+ * 2. JSDoc documentation on public APIs
  *
  * Setup:
- * 1. npm install -D eslint eslint-plugin-jsdoc @typescript-eslint/parser
- * 2. Copy this file to your project root
+ * 1. npm install -D eslint @next/eslint-plugin-next eslint-plugin-jsdoc @typescript-eslint/parser
+ * 2. Copy this file to your project root as eslint.config.mjs
  * 3. Add scripts to package.json:
+ *    "lint": "biome check .",
+ *    "lint:fix": "biome check --write .",
+ *    "lint:next": "eslint",
  *    "lint:docs": "eslint --max-warnings 0",
  *    "lint:docs:fix": "eslint --fix"
  */
+import nextPlugin from "@next/eslint-plugin-next";
 import jsdoc from "eslint-plugin-jsdoc";
 import tsParser from "@typescript-eslint/parser";
 
 export default [
-  // Global ignores (build artifacts, node_modules, etc.)
+  // Global ignores - only lint src/ (excluding tests)
   {
     ignores: [
       ".next/**",
+      "out/**",
+      "build/**",
+      "next-env.d.ts",
       "node_modules/**",
-      "generated/**",
+      "dist/**",
+      ".prisma/**",
+      "prisma/**",
+      "src/generated/**",
+      "src/__tests__/**",
+      ".vercel/**",
+      ".cache/**",
+      ".turbo/**",
+      "scripts/**",
+      "tests/**",
+      "public/**",
       "*.config.js",
       "*.config.mjs",
       "*.config.ts",
     ],
   },
 
-  // Apply JSDoc recommended rules for TypeScript
-  jsdoc.configs["flat/recommended-typescript-error"],
+  // Next.js best practices (Core Web Vitals, image optimization, App Router patterns)
+  {
+    files: ["src/**/*.{js,jsx,ts,tsx}"],
+    plugins: {
+      "@next/next": nextPlugin,
+    },
+    rules: {
+      ...nextPlugin.configs.recommended.rules,
+      ...nextPlugin.configs["core-web-vitals"].rules,
+    },
+  },
 
+  // Global linter options
+  {
+    linterOptions: {
+      reportUnusedDisableDirectives: "warn",
+    },
+  },
+
+  // JSDoc enforcement for source files (excluding tests)
   {
     files: ["src/**/*.ts", "src/**/*.tsx"],
     ignores: [
+      "src/__tests__/**",
       "**/*.test.ts",
       "**/*.test.tsx",
       "**/*.spec.ts",
       "**/*.spec.tsx",
+      "**/*.stories.ts",
+      "**/*.stories.tsx",
       "**/*.d.ts",
       "**/generated/**",
     ],
     languageOptions: {
       parser: tsParser,
       parserOptions: {
-        project: "./tsconfig.json",
+        project: true,
         tsconfigRootDir: import.meta.dirname,
       },
     },
@@ -57,7 +97,7 @@ export default [
             FunctionDeclaration: true,
             MethodDefinition: true,
             ClassDeclaration: true,
-            ArrowFunctionExpression: false, // Too noisy for inline callbacks
+            ArrowFunctionExpression: false,
             FunctionExpression: false,
           },
           contexts: [
@@ -74,26 +114,33 @@ export default [
       "jsdoc/require-returns-description": "warn",
 
       // Don't require @param/@returns when TypeScript provides types
-      // (reduces redundancy with TS type annotations)
       "jsdoc/require-param": "off",
       "jsdoc/require-returns": "off",
       "jsdoc/require-param-type": "off",
       "jsdoc/require-returns-type": "off",
 
       // Validate existing JSDoc is correct
-      "jsdoc/check-param-names": "error",
+      "jsdoc/check-param-names": "warn",
       "jsdoc/check-tag-names": "error",
-      "jsdoc/check-types": "error",
-      "jsdoc/valid-types": "error",
+      "jsdoc/check-types": "warn",
+      "jsdoc/valid-types": "warn",
     },
   },
 
-  // Stricter rules for server-side code (tRPC routers, API routes)
+  // Stricter JSDoc for server-side code
   {
-    files: ["src/server/**/*.ts", "src/app/api/**/*.ts"],
+    files: ["src/app/api/**/*.ts", "src/lib/**/*.ts", "src/server/**/*.ts"],
+    languageOptions: {
+      parser: tsParser,
+      parserOptions: {
+        project: true,
+        tsconfigRootDir: import.meta.dirname,
+      },
+    },
+    plugins: { jsdoc },
     rules: {
       "jsdoc/require-jsdoc": [
-        "error", // Error instead of warn for server code
+        "warn",
         {
           publicOnly: true,
           require: {
