@@ -75,7 +75,8 @@
         "src/__tests__/**",
         "**/*.test.ts",
         "**/*.test.tsx",
-        "**/*.spec.ts"
+        "**/*.spec.ts",
+        "**/*.spec.tsx"
       ],
       "linter": {
         "rules": {

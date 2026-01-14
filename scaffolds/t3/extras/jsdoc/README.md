@@ -24,6 +24,10 @@ Copy `eslint.config.mjs` to your project root (replaces the base Next.js-only co
 ## Example JSDoc
 
 ```typescript
+// Assumes tRPC and Zod imports:
+// import { createTRPCRouter, publicProcedure } from "@/server/trpc";
+// import { z } from "zod";
+
 /**
  * User management router.
  * Handles preferences, usage tracking, and account operations.

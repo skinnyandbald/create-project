@@ -12,8 +12,8 @@
  * 3. Add scripts to package.json:
  *    "lint": "biome check .",
  *    "lint:fix": "biome check --write .",
- *    "lint:next": "eslint 2>&1 | { grep -v 'Definition for rule' || true; }",
- *    "lint:docs": "eslint --max-warnings 0 2>&1 | { grep -v 'Definition for rule' || true; }",
+ *    "lint:next": "eslint",
+ *    "lint:docs": "eslint --max-warnings 0",
  *    "lint:docs:fix": "eslint --fix"
  */
 import nextPlugin from "@next/eslint-plugin-next";
@@ -61,7 +61,7 @@ export default [
   // Global linter options
   {
     linterOptions: {
-      reportUnusedDisableDirectives: "off",
+      reportUnusedDisableDirectives: "warn",
     },
   },
 
@@ -82,7 +82,7 @@ export default [
     languageOptions: {
       parser: tsParser,
       parserOptions: {
-        project: "./tsconfig.json",
+        project: true,
         tsconfigRootDir: import.meta.dirname,
       },
     },
@@ -130,6 +130,13 @@ export default [
   // Stricter JSDoc for server-side code
   {
     files: ["src/app/api/**/*.ts", "src/lib/**/*.ts", "src/server/**/*.ts"],
+    languageOptions: {
+      parser: tsParser,
+      parserOptions: {
+        project: true,
+        tsconfigRootDir: import.meta.dirname,
+      },
+    },
     plugins: { jsdoc },
     rules: {
       "jsdoc/require-jsdoc": [

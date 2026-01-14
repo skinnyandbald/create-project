@@ -11,7 +11,7 @@
  * 3. Add scripts to package.json:
  *    "lint": "biome check .",
  *    "lint:fix": "biome check --write .",
- *    "lint:next": "eslint 2>&1 | { grep -v 'Definition for rule' || true; }"
+ *    "lint:next": "eslint"
  */
 import nextPlugin from "@next/eslint-plugin-next";
 
@@ -56,7 +56,7 @@ export default [
   // Global linter options
   {
     linterOptions: {
-      reportUnusedDisableDirectives: "off",
+      reportUnusedDisableDirectives: "warn",
     },
   },
 ];
