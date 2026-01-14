@@ -1,40 +1,24 @@
 # JSDoc Enforcement
 
-Adds JSDoc documentation enforcement alongside Biome.
+Adds JSDoc documentation requirements to the Biome + ESLint setup.
 
 ## Setup
 
+See [../README.md](../README.md) for full instructions.
+
 ```bash
-npm install -D eslint eslint-plugin-jsdoc @typescript-eslint/parser
+npm install -D eslint eslint-plugin-jsdoc @typescript-eslint/parser @next/eslint-plugin-next
 ```
 
-Copy `eslint.config.mjs` to your project root.
-
-Add to `package.json`:
-
-```json
-{
-  "scripts": {
-    "lint:docs": "eslint --max-warnings 0",
-    "lint:docs:fix": "eslint --fix"
-  }
-}
-```
-
-## How It Works
-
-| Tool | Purpose |
-|------|---------|
-| Biome | Formatting, general linting, `useSingleJsDocAsterisk` |
-| ESLint + eslint-plugin-jsdoc | Enforce documentation presence |
-| TypeScript (`checkJs: true`) | Validate JSDoc types match code |
+Copy `eslint.config.mjs` to your project root (replaces the base Next.js-only config).
 
 ## Severity Levels
 
 | Location | Severity | Rationale |
 |----------|----------|-----------|
-| `src/server/**/*.ts` | **error** | Server code must be documented |
-| `src/app/api/**/*.ts` | **error** | API routes must be documented |
+| `src/app/api/**/*.ts` | **warn** | API routes should be documented |
+| `src/lib/**/*.ts` | **warn** | Library code should be documented |
+| `src/server/**/*.ts` | **warn** | Server code should be documented |
 | `src/**/*.{ts,tsx}` | **warn** | Gradual adoption for other code |
 
 ## Example JSDoc
@@ -43,23 +27,35 @@ Add to `package.json`:
 /**
  * User management router.
  * Handles preferences, usage tracking, and account operations.
- * @module server/api/routers/user
  */
+export const userRouter = createTRPCRouter({
+  /**
+   * Get user preferences from database.
+   * Returns null for new users who haven't set preferences.
+   */
+  getPreferences: publicProcedure
+    .output(UserPreferencesSchema)
+    .query(async ({ ctx }) => { /* ... */ }),
+});
 
 /**
- * Schema for user preferences.
+ * Schema for user preferences output.
  */
-const UserPreferencesSchema = z.object({ ... });
-
-/**
- * Router for user account operations.
- */
-export const userRouter = createTRPCRouter({ ... });
+const UserPreferencesSchema = z.object({
+  newsletter_opted_in: z.boolean().nullable(),
+});
 ```
 
-## CI Integration
+## TypeScript Integration
 
-```yaml
-- name: Docs Compliance
-  run: npm run lint:docs
+JSDoc types are validated against TypeScript - no need for `@param` or `@returns` type annotations. Just write descriptions:
+
+```typescript
+/**
+ * Calculate total price including tax.
+ * Rounds to 2 decimal places.
+ */
+function calculateTotal(price: number, taxRate: number): number {
+  return Math.round((price * (1 + taxRate)) * 100) / 100;
+}
 ```
