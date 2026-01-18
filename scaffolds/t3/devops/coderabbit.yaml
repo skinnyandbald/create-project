@@ -27,6 +27,11 @@ reviews:
     drafts: false
     base_branches:
       - main
+      - develop
+      - "feature/*"
+      - "feat/*"
+      - "fix/*"
+      - "hotfix/*"
 
   finishing_touches:
     docstrings:
