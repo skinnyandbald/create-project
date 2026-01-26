@@ -191,12 +191,20 @@ scaffold_t3() {
 
     # Copy Claude setup
     print_step "Setting up Claude Code..."
-    mkdir -p .claude/commands
+    mkdir -p .claude/commands .claude/skills
     cp "$SCAFFOLDS_DIR/t3/CLAUDE.md" ./CLAUDE.md
     sed -i '' "s/{{PROJECT_NAME}}/$project_name/g" ./CLAUDE.md
     cp "$SCAFFOLDS_DIR/t3/settings.json" .claude/settings.json
     cp "$SCAFFOLDS_DIR/t3/mcp.json" .claude/mcp.json
     cp "$SCAFFOLDS_DIR/t3/claudeignore" .claudeignore
+    # Copy Claude commands
+    if [ -d "$SCAFFOLDS_DIR/t3/commands" ] && [ "$(ls -A "$SCAFFOLDS_DIR/t3/commands" 2>/dev/null)" ]; then
+        cp -r "$SCAFFOLDS_DIR/t3/commands/"* .claude/commands/
+    fi
+    # Copy Claude skills
+    if [ -d "$SCAFFOLDS_DIR/t3/skills" ] && [ "$(ls -A "$SCAFFOLDS_DIR/t3/skills" 2>/dev/null)" ]; then
+        cp -r "$SCAFFOLDS_DIR/t3/skills/"* .claude/skills/
+    fi
 
     # Copy devops
     print_step "Setting up DevOps..."
