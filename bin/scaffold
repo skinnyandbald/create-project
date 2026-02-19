@@ -354,91 +354,6 @@ upgrade_project() {
     print_success "Project upgraded!"
 }
 
-# Configure MCP connector profiles for the project
-configure_mcp_connectors() {
-    local project_name="$1"
-    local project_path="$PROJECT_DIR/$project_name"
-    local claude_config="$HOME/.claude.json"
-
-    # All available claude.ai connectors with dev-project defaults
-    # Format: "connector_name:default" where default is "on" or "off"
-    local connectors=(
-        "claude.ai Vercel:on"
-        "claude.ai Sentry:on"
-        "claude.ai Mermaid Chart:on"
-        "claude.ai Cloudflare Developer Platform:on"
-        "claude.ai Asana:on"
-        "claude.ai Figma:off"
-        "claude.ai Clay:off"
-        "claude.ai Fireflies:off"
-    )
-
-    print_header "MCP Connector Profiles"
-    echo -e "  Configure which claude.ai connectors are enabled for this project."
-    echo -e "  Disabling unused connectors reduces context window usage.\n"
-
-    local disabled_connectors=()
-
-    for entry in "${connectors[@]}"; do
-        local name="${entry%%:*}"
-        local default="${entry##*:}"
-        local short_name="${name#claude.ai }"
-
-        if [ "$default" = "on" ]; then
-            if ! confirm "  Enable ${CYAN}$short_name${NC}?" "y"; then
-                disabled_connectors+=("$name")
-            fi
-        else
-            if ! confirm "  Enable ${CYAN}$short_name${NC}?" "n"; then
-                disabled_connectors+=("$name")
-            fi
-        fi
-    done
-
-    # Write disabled connectors to ~/.claude.json
-    if [ ${#disabled_connectors[@]} -gt 0 ]; then
-        print_step "Saving connector profile to ~/.claude.json..."
-
-        if [ ! -f "$claude_config" ]; then
-            print_warning "~/.claude.json not found, skipping connector config"
-            return
-        fi
-
-        # Check for jq
-        if ! command -v jq &>/dev/null; then
-            print_warning "jq not installed. Install with: brew install jq"
-            print_warning "Skipping connector profile (you can configure manually in /mcp)"
-            return
-        fi
-
-        # Build the JSON array of disabled connectors
-        local json_array="[]"
-        for connector in "${disabled_connectors[@]}"; do
-            json_array=$(echo "$json_array" | jq --arg c "$connector" '. + [$c]')
-        done
-
-        # Merge into ~/.claude.json: ensure the project path exists and set disabledMcpServers
-        local tmp_file
-        tmp_file=$(mktemp)
-        jq --arg path "$project_path" --argjson disabled "$json_array" '
-            .projects[$path] = (.projects[$path] // {}) |
-            .projects[$path].disabledMcpServers = (
-                (.projects[$path].disabledMcpServers // [])
-                + $disabled
-                | unique
-            )
-        ' "$claude_config" > "$tmp_file" && mv "$tmp_file" "$claude_config"
-
-        local count=${#disabled_connectors[@]}
-        local enabled_count=$(( ${#connectors[@]} - count ))
-        print_success "Connector profile saved: $enabled_count enabled, $count disabled"
-    else
-        print_success "All connectors enabled for this project"
-    fi
-
-    echo ""
-}
-
 # Initialize git and optionally create GitHub repo
 init_git() {
     local project_name="$1"
@@ -486,7 +401,6 @@ main() {
     local project_name=""
     local project_type=""
     local upgrade_mode=false
-    local mcp_only=false
 
     # Parse arguments
     while [[ $# -gt 0 ]]; do
@@ -497,10 +411,6 @@ main() {
                 ;;
             --upgrade)
                 upgrade_mode=true
-                shift
-                ;;
-            --configure-mcp)
-                mcp_only=true
                 shift
                 ;;
             -*)
@@ -530,22 +440,9 @@ main() {
     local project_path="$PROJECT_DIR/$project_name"
     validate_project_path "$project_path"
 
-    # Handle MCP-only mode (reconfigure connectors for existing project)
-    if $mcp_only; then
-        if [ ! -d "$project_path" ]; then
-            print_error "Project $project_name does not exist"
-            exit 1
-        fi
-        configure_mcp_connectors "$project_name"
-        print_success "MCP connectors reconfigured for $project_name"
-        echo -e "  ${YELLOW}Note:${NC} Restart any active Claude Code session for changes to take effect.\n"
-        exit 0
-    fi
-
     # Handle upgrade mode
     if $upgrade_mode; then
         upgrade_project "$project_name"
-        configure_mcp_connectors "$project_name"
         init_git "$project_name"
         echo -e "\n${GREEN}Done!${NC} cd ~/code/$project_name"
         exit 0
@@ -558,7 +455,6 @@ main() {
     if [ $existing_status -eq 1 ]; then
         if confirm "Discovery project exists. Upgrade to a stack?"; then
             upgrade_project "$project_name"
-            configure_mcp_connectors "$project_name"
             init_git "$project_name"
             echo -e "\n${GREEN}Done!${NC} cd ~/code/$project_name"
             exit 0
@@ -592,9 +488,6 @@ main() {
             exit 1
             ;;
     esac
-
-    # Configure MCP connectors
-    configure_mcp_connectors "$project_name"
 
     # Git setup
     init_git "$project_name"
