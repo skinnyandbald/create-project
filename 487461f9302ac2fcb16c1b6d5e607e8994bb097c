@@ -1,0 +1,31 @@
+scaffolds/t3/extras/.husky/pre-commit
+  a71faf24e3cf2769 2
+bin/scaffold
+  a71faf24e3cf2769 194,200-204,226,229
+scaffolds/t3/hooks/lint-after-edit.sh
+  a71faf24e3cf2769 1-33
+scaffolds/t3/settings.json
+  a71faf24e3cf2769 2-27
+scaffolds/t3/hooks/typecheck-before-commit.sh
+  a71faf24e3cf2769 1-31
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.8",
+  "base_commit_sha": "487461f9302ac2fcb16c1b6d5e607e8994bb097c",
+  "prompts": {
+    "a71faf24e3cf2769": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5550fe72-50c2-48aa-a219-f59a5cea2005",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Ben Fisher <ben@skinnyandbald.com>",
+      "messages": [],
+      "total_additions": 99,
+      "total_deletions": 3,
+      "accepted_lines": 99,
+      "overriden_lines": 0
+    }
+  }
+}
