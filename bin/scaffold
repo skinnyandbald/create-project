@@ -191,12 +191,17 @@ scaffold_t3() {
 
     # Copy Claude setup
     print_step "Setting up Claude Code..."
-    mkdir -p .claude/commands .claude/skills
+    mkdir -p .claude/commands .claude/skills .claude/hooks
     cp "$SCAFFOLDS_DIR/t3/CLAUDE.md" ./CLAUDE.md
     sed -i '' "s/{{PROJECT_NAME}}/$project_name/g" ./CLAUDE.md
     cp "$SCAFFOLDS_DIR/t3/settings.json" .claude/settings.json
     cp "$SCAFFOLDS_DIR/t3/mcp.json" .claude/mcp.json
     cp "$SCAFFOLDS_DIR/t3/claudeignore" .claudeignore
+    # Copy Claude hooks (lint-after-edit, typecheck-before-commit)
+    if [ -d "$SCAFFOLDS_DIR/t3/hooks" ] && [ "$(ls -A "$SCAFFOLDS_DIR/t3/hooks" 2>/dev/null)" ]; then
+        cp "$SCAFFOLDS_DIR/t3/hooks/"*.sh .claude/hooks/
+        chmod +x .claude/hooks/*.sh
+    fi
     # Copy Claude commands
     if [ -d "$SCAFFOLDS_DIR/t3/commands" ] && [ "$(ls -A "$SCAFFOLDS_DIR/t3/commands" 2>/dev/null)" ]; then
         cp -r "$SCAFFOLDS_DIR/t3/commands/"* .claude/commands/
@@ -218,10 +223,10 @@ scaffold_t3() {
     print_step "Setting up Biome..."
     cp "$SCAFFOLDS_DIR/t3/extras/biome.json" ./biome.json
 
-    # Initialize husky
+    # Initialize husky + pre-commit hooks (lint-staged + typecheck)
     print_step "Setting up git hooks..."
     npx husky init
-    echo 'npx lint-staged' > .husky/pre-commit
+    cp "$SCAFFOLDS_DIR/t3/extras/.husky/pre-commit" .husky/pre-commit
 
     print_success "T3 project created!"
 }
