@@ -2,6 +2,11 @@
 
 Opinionated project scaffolding tool with Claude Code integration.
 
+## Prerequisites
+
+- Node.js >= 22
+- pnpm
+
 ## Installation
 
 1. Clone this repo:
@@ -29,17 +34,26 @@ This will:
 # Interactive mode
 scaffold
 
-# With project name
+# Next.js (default)
 scaffold my-app
 
-# Direct stack selection
-scaffold my-app --type=t3
+# Explicit Next.js
+scaffold my-app --type=nextjs
+
+# Next.js composable variant (Better Auth + Drizzle + Neon)
+scaffold my-app --composable
+
+# Laravel
 scaffold my-app --type=laravel
+
+# Discovery (requirements gathering)
 scaffold my-app --type=discovery
 
 # Upgrade discovery project to a stack
 scaffold my-app --upgrade
 ```
+
+> `--type=t3` is still accepted as an alias for `--type=nextjs`.
 
 ### Claude Skill
 
@@ -52,7 +66,8 @@ In any Claude Code session:
 
 | Type | Stack | Deployment |
 |------|-------|------------|
-| **T3** | Next.js, TypeScript, Tailwind, tRPC, Prisma | Vercel |
+| **Next.js** | Next.js 16, TypeScript 6, Tailwind v4, tRPC v11, Supabase, Biome v2 | Vercel |
+| **Next.js `--composable`** | Next.js 16, TypeScript 6, Tailwind v4, tRPC v11, Better Auth, Drizzle, Neon, Biome v2 | Vercel |
 | **Laravel** | Laravel, Inertia, React, TypeScript | Laravel Cloud |
 | **Discovery** | Requirements gathering only | N/A |
 
@@ -66,11 +81,26 @@ In any Claude Code session:
 - `.github/workflows/` - Claude GitHub Actions
 - `.claudeignore` - Protect secrets from Claude
 
-### T3 Projects
-- Full create-t3-app setup
+### Next.js Projects
+- Next.js 16 (App Router, Turbopack, proxy.ts)
+- Supabase (Auth + Database + Storage)
+- tRPC v11 (type-safe API)
+- Tailwind CSS v4 (CSS-first config)
+- Zod 4 (schema validation)
+- TypeScript 6 (strict mode)
+- Biome v2 (linting + formatting)
+- Vitest (testing)
 - UI Kit: lucide, cva, clsx, tailwind-merge, sonner, next-themes, radix
-- Testing: Vitest, Playwright, husky, lint-staged, oxlint
 - `vercel.json` - Deployment config
+
+#### Composable variant (`--composable`)
+
+Replaces Supabase with a composable auth/database stack:
+- **Better Auth** instead of Supabase Auth
+- **Drizzle ORM** instead of Supabase client
+- **Neon** (serverless Postgres) instead of Supabase Database
+
+Everything else (tRPC, Tailwind, Biome, Vitest, etc.) stays the same.
 
 ### Laravel Projects
 - Laravel + Breeze with React/Inertia
@@ -81,7 +111,7 @@ In any Claude Code session:
 ### Discovery Projects
 - Requirements gathering commands
 - Minimal setup until stack is chosen
-- Upgrade path to T3 or Laravel
+- Upgrade path to Next.js or Laravel
 
 ## Configuration
 
@@ -97,7 +127,7 @@ Re-run `./setup.sh` to change the projects directory.
 Templates are in `scaffolds/`:
 ```
 scaffolds/
-├── t3/               # T3 templates
+├── nextjs/           # Next.js templates
 ├── laravel/          # Laravel templates
 └── discovery/        # Discovery templates
 ```
