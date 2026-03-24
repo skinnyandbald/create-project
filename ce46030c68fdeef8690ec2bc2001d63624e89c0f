@@ -1,0 +1,49 @@
+docs/superpowers/plans/scaffold-modernization/phase-1.4.md
+  2422cd8c9d295af5 1-57
+docs/superpowers/plans/scaffold-modernization/phase-2.1.md
+  2422cd8c9d295af5 1-41
+docs/superpowers/plans/scaffold-modernization/phase-4.1.md
+  2422cd8c9d295af5 1-97
+docs/superpowers/plans/scaffold-modernization/phase-5.1.md
+  2422cd8c9d295af5 1-47
+docs/superpowers/plans/scaffold-modernization/phase-1.2.md
+  2422cd8c9d295af5 1-59
+docs/superpowers/plans/scaffold-modernization/phase-4.2.md
+  2422cd8c9d295af5 1-72
+docs/superpowers/plans/scaffold-modernization/phase-2.3.md
+  2422cd8c9d295af5 1-38
+docs/superpowers/plans/scaffold-modernization/phase-1.1.md
+  2422cd8c9d295af5 1-61
+docs/superpowers/plans/scaffold-modernization/phase-3.2.md
+  2422cd8c9d295af5 1-70
+docs/superpowers/plans/scaffold-modernization/README.md
+  2422cd8c9d295af5 1-25
+docs/superpowers/plans/scaffold-modernization/phase-3.1.md
+  2422cd8c9d295af5 1-52
+docs/superpowers/plans/scaffold-modernization/phase-1.3.md
+  2422cd8c9d295af5 1-80
+docs/superpowers/plans/scaffold-modernization/phase-2.2.md
+  2422cd8c9d295af5 1-75
+docs/superpowers/plans/scaffold-modernization/phase-5.2.md
+  2422cd8c9d295af5 1-25
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.17",
+  "base_commit_sha": "ce46030c68fdeef8690ec2bc2001d63624e89c0f",
+  "prompts": {
+    "2422cd8c9d295af5": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8b9f70c3-cd22-458b-967e-b7b6a757e86c",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Ben Fisher <ben@skinnyandbald.com>",
+      "messages": [],
+      "total_additions": 1469,
+      "total_deletions": 0,
+      "accepted_lines": 1469,
+      "overriden_lines": 0
+    }
+  }
+}
