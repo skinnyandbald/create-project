@@ -1,0 +1,25 @@
+scaffolds/nextjs/claude/CLAUDE.md
+  2422cd8c9d295af5 1-518
+scaffolds/nextjs/claude/settings.json
+  2422cd8c9d295af5 1-52
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.17",
+  "base_commit_sha": "5b19893215da52b8246a7e025853c61a82b27d30",
+  "prompts": {
+    "2422cd8c9d295af5": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8b9f70c3-cd22-458b-967e-b7b6a757e86c",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Ben Fisher <ben@skinnyandbald.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 0,
+      "accepted_lines": 1240,
+      "overriden_lines": 0
+    }
+  }
+}
