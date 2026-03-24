@@ -1,0 +1,27 @@
+scaffolds/nextjs/template/src/lib/trpc/client.tsx
+  2422cd8c9d295af5 1-31
+scaffolds/nextjs/template/src/lib/trpc/server.ts
+  2422cd8c9d295af5 1-9
+scaffolds/nextjs/template/src/app/api/trpc/[trpc]/route.ts
+  2422cd8c9d295af5 1-13
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.17",
+  "base_commit_sha": "6361bac84d7a5b93e0228e9fdb636512ec963ae1",
+  "prompts": {
+    "2422cd8c9d295af5": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8b9f70c3-cd22-458b-967e-b7b6a757e86c",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Ben Fisher <ben@skinnyandbald.com>",
+      "messages": [],
+      "total_additions": 53,
+      "total_deletions": 0,
+      "accepted_lines": 723,
+      "overriden_lines": 0
+    }
+  }
+}
