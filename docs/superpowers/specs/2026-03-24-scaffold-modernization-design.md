@@ -106,7 +106,7 @@ scaffolds/nextjs/
 The CLI uses `set -euo pipefail` and a cleanup trap for rollback on failure:
 
 ```bash
-trap 'rm -rf "$TARGET_DIR"' ERR
+trap '[[ -n "${TARGET_DIR:-}" ]] && [[ "$TARGET_DIR" != "/" ]] && rm -rf "$TARGET_DIR"' ERR INT TERM
 ```
 
 Steps:
@@ -128,6 +128,8 @@ The composable variant uses a **complete `package.json`** (not a patch file) to 
 
 ```json
 {
+  "name": "{{PROJECT_NAME}}",
+  "private": true,
   "engines": {
     "node": ">=22.0.0"
   },
@@ -149,8 +151,11 @@ The composable variant uses a **complete `package.json`** (not a patch file) to 
     "@types/react": "^19.2.0",
     "@types/react-dom": "^19.2.0",
     "@biomejs/biome": "^2.4.0",
+    "@types/node": "^22.0.0",
     "vitest": "^3.1.0",
+    "jsdom": "^26.0.0",
     "@testing-library/react": "^16.3.0",
+    "@tailwindcss/postcss": "^4.2.0",
     "husky": "^9.1.0",
     "lint-staged": "^16.4.0"
   },
@@ -226,10 +231,20 @@ export async function proxy(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser()
 
   if (request.nextUrl.pathname.startsWith('/dashboard') && !user) {
-    return NextResponse.redirect(new URL('/sign-in', request.url))
+    const redirectRes = NextResponse.redirect(new URL('/sign-in', request.url))
+    response.cookies.getAll().forEach((cookie) => {
+      redirectRes.cookies.set(cookie.name, cookie.value)
+    })
+    return redirectRes
   }
 
   return response
+}
+
+export const config = {
+  matcher: [
+    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+  ],
 }
 ```
 
@@ -245,7 +260,7 @@ const nextConfig: NextConfig = {
 export default nextConfig
 ```
 
-### tailwind.css (v4 CSS-first)
+### globals.css (Tailwind v4 CSS-first)
 
 ```css
 @import "tailwindcss";
@@ -254,6 +269,32 @@ export default nextConfig
   --font-sans: "Inter", sans-serif;
   --font-mono: "Geist Mono", monospace;
 }
+```
+
+### postcss.config.mjs
+
+```js
+export default {
+  plugins: {
+    '@tailwindcss/postcss': {},
+  },
+}
+```
+
+### vitest.config.ts
+
+```ts
+import { defineConfig } from 'vitest/config'
+import path from 'node:path'
+
+export default defineConfig({
+  test: {
+    environment: 'jsdom',
+  },
+  resolve: {
+    alias: { '@': path.resolve(__dirname, './src') },
+  },
+})
 ```
 
 ### tRPC context with Supabase
@@ -326,7 +367,7 @@ export const createTRPCContext = cache(async () => {
     "paths": {
       "@/*": ["./src/*"]
     },
-    "jsx": "preserve",
+    "jsx": "react-jsx",
     "incremental": true,
     "skipLibCheck": true,
     "noEmit": true,
@@ -396,7 +437,7 @@ Bash test script that runs as part of the scaffold repo's own CI:
 1. **File tree assertion**: Scaffold into `/tmp`, assert all expected files exist for both variants
 2. **Placeholder check**: `grep -r '{{PROJECT_NAME}}' /tmp/test-app` returns zero matches
 3. **Package.json correctness**: `jq` assertions on dependency names and script entries
-4. **Install**: `pnpm install --frozen-lockfile` succeeds
+4. **Install**: `pnpm install` succeeds (no lockfile in template; `--frozen-lockfile` reserved for scaffold repo CI)
 5. **Typecheck**: `pnpm tsc --noEmit` passes
 6. **Lint**: `pnpm biome check` passes
 7. **Build**: `pnpm next build` succeeds (production build)
@@ -422,6 +463,12 @@ describe('scaffold health', () => {
     const { z } = await import('zod')
     const schema = z.object({ name: z.string() })
     expect(schema.parse({ name: 'test' })).toEqual({ name: 'test' })
+  })
+
+  it('tRPC router initializes', async () => {
+    const { appRouter } = await import('@/server/trpc/router')
+    expect(appRouter).toBeDefined()
+    expect(appRouter._def.procedures).toHaveProperty('health')
   })
 })
 ```
