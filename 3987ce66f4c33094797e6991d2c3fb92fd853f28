@@ -1,0 +1,23 @@
+README.md
+  2422cd8c9d295af5 5-9,37,40-44,46,48-49,56,69-70,84-92,96-103,114,130
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.18",
+  "base_commit_sha": "3987ce66f4c33094797e6991d2c3fb92fd853f28",
+  "prompts": {
+    "2422cd8c9d295af5": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8b9f70c3-cd22-458b-967e-b7b6a757e86c",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Ben Fisher <ben@skinnyandbald.com>",
+      "messages": [],
+      "total_additions": 388,
+      "total_deletions": 268,
+      "accepted_lines": 1044,
+      "overriden_lines": 0
+    }
+  }
+}
