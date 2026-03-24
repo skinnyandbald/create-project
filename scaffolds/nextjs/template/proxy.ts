@@ -1,41 +1,45 @@
-import { createServerClient } from '@supabase/ssr'
-import { NextRequest, NextResponse } from 'next/server'
+import { createServerClient } from "@supabase/ssr";
+import { type NextRequest, NextResponse } from "next/server";
 
 export async function proxy(request: NextRequest) {
-  let response = NextResponse.next({ request })
+  let response = NextResponse.next({ request });
 
   const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    process.env.NEXT_PUBLIC_SUPABASE_URL ?? "",
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? "",
     {
       cookies: {
         getAll: () => request.cookies.getAll(),
         setAll: (cookiesToSet) => {
-          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
-          response = NextResponse.next({ request })
-          cookiesToSet.forEach(({ name, value, options }) => {
-            response.cookies.set(name, value, options)
-          })
+          for (const { name, value } of cookiesToSet) {
+            request.cookies.set(name, value);
+          }
+          response = NextResponse.next({ request });
+          for (const { name, value, options } of cookiesToSet) {
+            response.cookies.set(name, value, options);
+          }
         },
       },
+    },
+  );
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (request.nextUrl.pathname.startsWith("/dashboard") && !user) {
+    const redirectRes = NextResponse.redirect(new URL("/sign-in", request.url));
+    for (const cookie of response.cookies.getAll()) {
+      redirectRes.cookies.set(cookie.name, cookie.value);
     }
-  )
-
-  const { data: { user } } = await supabase.auth.getUser()
-
-  if (request.nextUrl.pathname.startsWith('/dashboard') && !user) {
-    const redirectRes = NextResponse.redirect(new URL('/sign-in', request.url))
-    response.cookies.getAll().forEach((cookie) => {
-      redirectRes.cookies.set(cookie.name, cookie.value)
-    })
-    return redirectRes
+    return redirectRes;
   }
 
-  return response
+  return response;
 }
 
 export const config = {
   matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
   ],
-}
+};

@@ -1,12 +1,21 @@
 export default function HomePage() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-4">
-      <h1 className="text-4xl font-bold">{{PROJECT_NAME}}</h1>
-      <p className="text-lg text-gray-500">Built with Next.js 16, Supabase, and tRPC</p>
+      <h1 className="text-4xl font-bold">{"{{PROJECT_NAME}}"}</h1>
+      <p className="text-lg text-gray-500">
+        Built with Next.js 16, Supabase, and tRPC
+      </p>
       <div className="flex gap-4">
-        <a href="/dashboard" className="rounded bg-foreground px-4 py-2 text-background">Dashboard</a>
-        <a href="/sign-in" className="rounded border px-4 py-2">Sign In</a>
+        <a
+          href="/dashboard"
+          className="rounded bg-foreground px-4 py-2 text-background"
+        >
+          Dashboard
+        </a>
+        <a href="/sign-in" className="rounded border px-4 py-2">
+          Sign In
+        </a>
       </div>
     </div>
-  )
+  );
 }
