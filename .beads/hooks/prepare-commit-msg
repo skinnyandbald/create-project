@@ -21,4 +21,6 @@ if ! command -v bd >/dev/null 2>&1; then
     exit 0
 fi
 
-exec bd hook prepare-commit-msg "$@"
+# "bd hook" doesn't support prepare-commit-msg yet (v0.55.4).
+# Use "bd hooks run" which handles it gracefully (exit 0).
+bd hooks run prepare-commit-msg "$@" 2>/dev/null || exit 0
