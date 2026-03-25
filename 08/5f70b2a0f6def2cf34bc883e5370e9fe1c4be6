@@ -1,0 +1,47 @@
+scaffolds/nextjs/composable/src/server/trpc/init.ts
+  2422cd8c9d295af5 1-28
+scaffolds/nextjs/composable/src/lib/auth/client.ts
+  2422cd8c9d295af5 1-5
+scaffolds/nextjs/composable/src/app/(auth)/sign-up/page.tsx
+  2422cd8c9d295af5 1-71
+scaffolds/nextjs/composable/src/app/(auth)/sign-in/page.tsx
+  2422cd8c9d295af5 1-62
+scaffolds/nextjs/composable/src/app/dashboard/page.tsx
+  2422cd8c9d295af5 1-17
+scaffolds/nextjs/composable/package.json
+  2422cd8c9d295af5 1-46
+scaffolds/nextjs/composable/drizzle.config.ts
+  2422cd8c9d295af5 1-10
+scaffolds/nextjs/composable/src/app/api/auth/[...all]/route.ts
+  2422cd8c9d295af5 1-4
+scaffolds/nextjs/composable/src/lib/db/schema.ts
+  2422cd8c9d295af5 1-56
+scaffolds/nextjs/composable/src/lib/auth/index.ts
+  2422cd8c9d295af5 1-14
+scaffolds/nextjs/composable/proxy.ts
+  2422cd8c9d295af5 1-20
+scaffolds/nextjs/composable/src/lib/db/index.ts
+  2422cd8c9d295af5 1-6
+scaffolds/nextjs/composable/.env.example
+  2422cd8c9d295af5 1-6
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.18",
+  "base_commit_sha": "085f70b2a0f6def2cf34bc883e5370e9fe1c4be6",
+  "prompts": {
+    "2422cd8c9d295af5": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8b9f70c3-cd22-458b-967e-b7b6a757e86c",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Ben Fisher <ben@skinnyandbald.com>",
+      "messages": [],
+      "total_additions": 345,
+      "total_deletions": 0,
+      "accepted_lines": 1338,
+      "overriden_lines": 0
+    }
+  }
+}

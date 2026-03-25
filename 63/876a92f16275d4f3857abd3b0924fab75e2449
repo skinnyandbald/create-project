@@ -1,0 +1,33 @@
+scaffolds/nextjs/devops/.github/workflows/ci.yml
+  2422cd8c9d295af5 1-22
+scaffolds/nextjs/devops/PULL_REQUEST_TEMPLATE.md
+  2422cd8c9d295af5 1-49
+scaffolds/nextjs/devops/vercel.json
+  2422cd8c9d295af5 1-3
+scaffolds/nextjs/devops/.github/workflows/claude.yml
+  2422cd8c9d295af5 1-39
+scaffolds/nextjs/devops/.github/workflows/claude-code-review.yml
+  2422cd8c9d295af5 1-53
+scaffolds/nextjs/devops/coderabbit.yaml
+  2422cd8c9d295af5 1-123
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.17",
+  "base_commit_sha": "63876a92f16275d4f3857abd3b0924fab75e2449",
+  "prompts": {
+    "2422cd8c9d295af5": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8b9f70c3-cd22-458b-967e-b7b6a757e86c",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Ben Fisher <ben@skinnyandbald.com>",
+      "messages": [],
+      "total_additions": 859,
+      "total_deletions": 0,
+      "accepted_lines": 1529,
+      "overriden_lines": 0
+    }
+  }
+}

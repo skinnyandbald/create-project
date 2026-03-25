@@ -1,0 +1,23 @@
+docs/superpowers/specs/2026-03-24-scaffold-modernization-design.md
+  2422cd8c9d295af5 109,131-132,154,156,158,234-238,243-247,263,274-297,370,440,467-472
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.17",
+  "base_commit_sha": "b34fdf0ccfa4aef3eaca5ae66b636bb9dd6846cd",
+  "prompts": {
+    "2422cd8c9d295af5": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8b9f70c3-cd22-458b-967e-b7b6a757e86c",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Ben Fisher <ben@skinnyandbald.com>",
+      "messages": [],
+      "total_additions": 52,
+      "total_deletions": 5,
+      "accepted_lines": 52,
+      "overriden_lines": 0
+    }
+  }
+}

@@ -1,0 +1,23 @@
+scaffolds/nextjs/template/src/__tests__/smoke.test.ts
+  2422cd8c9d295af5 1-15
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.18",
+  "base_commit_sha": "9bd566f55a9c9036773b6853180a278fa12abab4",
+  "prompts": {
+    "2422cd8c9d295af5": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8b9f70c3-cd22-458b-967e-b7b6a757e86c",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Ben Fisher <ben@skinnyandbald.com>",
+      "messages": [],
+      "total_additions": 15,
+      "total_deletions": 0,
+      "accepted_lines": 685,
+      "overriden_lines": 0
+    }
+  }
+}
