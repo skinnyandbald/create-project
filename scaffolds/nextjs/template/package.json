@@ -30,7 +30,11 @@
     "husky": "^9.1.0",
     "lint-staged": "^16.4.0"
   },
+  "lint-staged": {
+    "*.{ts,tsx,js,jsx,json,css,md}": ["biome check --write"]
+  },
   "scripts": {
+    "prepare": "husky",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",

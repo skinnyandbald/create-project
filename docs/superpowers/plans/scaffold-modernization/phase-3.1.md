@@ -23,7 +23,7 @@
 
 ---
 
-### Steps
+## Steps
 
 - [ ] **3.1.1** Create directory structure: `mkdir -p scaffolds/nextjs/claude/{hooks,commands,skills,presets}`
 

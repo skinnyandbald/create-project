@@ -6,7 +6,12 @@ export default async function DashboardPage() {
   const supabase = await createClient();
   const {
     data: { user },
+    error,
   } = await supabase.auth.getUser();
+
+  if (error) {
+    console.error("Failed to get user:", error.message);
+  }
 
   return (
     <div className="p-8">

@@ -108,15 +108,17 @@ create_worktree() {
   ensure_gitignore
 
   # Update base branch
+  local base_ref="origin/$from_branch"
   echo -e "${BLUE}Updating $from_branch...${NC}"
   if ! git fetch origin "$from_branch" 2>/dev/null; then
     echo -e "${YELLOW}Warning: Failed to fetch $from_branch from origin${NC}"
     echo -e "${YELLOW}Continuing with local reference (may be stale)${NC}"
+    base_ref="$from_branch"
   fi
 
   # Create worktree
   echo -e "${BLUE}Creating worktree...${NC}"
-  git worktree add -b "$branch_name" "$worktree_path" "origin/$from_branch"
+  git worktree add -b "$branch_name" "$worktree_path" "$base_ref"
 
   # Symlink .env
   symlink_env "$worktree_path"

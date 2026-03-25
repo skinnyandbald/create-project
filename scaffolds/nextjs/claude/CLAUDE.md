@@ -489,7 +489,7 @@ Biome 2 uses `includes` (not `include`), `linter.domains`, and `assist.actions.s
 
 ## Project Structure
 
-```
+```text
 src/
 ├── app/              # Next.js App Router pages
 ├── components/       # React components

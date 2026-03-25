@@ -14,7 +14,7 @@ if [ "$TOOL_NAME" != "Bash" ]; then
   exit 0
 fi
 
-if ! echo "$TOOL_INPUT" | grep -q "git commit"; then
+if ! echo "$TOOL_INPUT" | grep -qE '^\s*git\s+commit(\s|$)'; then
   exit 0
 fi
 

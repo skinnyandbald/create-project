@@ -21,7 +21,7 @@
 
 ---
 
-### Steps
+## Steps
 
 - [ ] **3.2.1** Create directory: `mkdir -p scaffolds/nextjs/devops/.github/workflows`
 

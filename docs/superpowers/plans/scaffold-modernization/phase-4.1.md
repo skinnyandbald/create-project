@@ -16,7 +16,7 @@
 
 ---
 
-### Steps
+## Steps
 
 - [ ] **4.1.1** Read current `bin/scaffold` to understand the full structure (argument parsing, interactive menu, type routing)
 
@@ -44,7 +44,7 @@ scaffold_nextjs() {
     # 3. Composable overlay
     if [ "$composable" = "true" ]; then
         print_step "Applying composable variant (Better Auth + Drizzle + Neon)..."
-        cp -r "$SCAFFOLDS_DIR/nextjs/composable/"* "$TARGET_DIR/"
+        cp -r "$SCAFFOLDS_DIR/nextjs/composable/." "$TARGET_DIR/"
     fi
 
     # 4. Claude configs
@@ -57,8 +57,8 @@ scaffold_nextjs() {
     print_step "Setting up DevOps..."
     cp "$SCAFFOLDS_DIR/nextjs/devops/vercel.json" "$TARGET_DIR/"
     cp "$SCAFFOLDS_DIR/nextjs/devops/coderabbit.yaml" "$TARGET_DIR/.coderabbit.yaml"
-    cp "$SCAFFOLDS_DIR/nextjs/devops/PULL_REQUEST_TEMPLATE.md" "$TARGET_DIR/.github/" 2>/dev/null || true
     mkdir -p "$TARGET_DIR/.github/workflows"
+    cp "$SCAFFOLDS_DIR/nextjs/devops/PULL_REQUEST_TEMPLATE.md" "$TARGET_DIR/.github/"
     cp "$SCAFFOLDS_DIR/nextjs/devops/.github/workflows/"*.yml "$TARGET_DIR/.github/workflows/"
 
     # 6. String replace (allowlisted extensions only)
@@ -67,7 +67,7 @@ scaffold_nextjs() {
         -name "*.ts" -o -name "*.tsx" -o -name "*.json" -o \
         -name "*.md" -o -name "*.yaml" -o -name "*.yml" -o \
         -name "*.css" -o -name ".env.example" \
-    \) -exec sed -i '' "s/{{PROJECT_NAME}}/$project_name/g" {} +
+    \) -exec perl -pi -e "s/{{PROJECT_NAME}}/$project_name/g" {} +
 
     # 7. Install
     print_step "Installing dependencies with pnpm..."

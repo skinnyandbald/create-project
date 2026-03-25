@@ -17,7 +17,7 @@
 
 ---
 
-### Steps
+## Steps
 
 - [ ] **1.2.1** Create `src/lib/supabase/server.ts`:
 ```ts

@@ -8,7 +8,7 @@
 
 ---
 
-### Steps
+## Steps
 
 - [ ] **4.2.1** Scaffold test project:
 ```bash
@@ -64,7 +64,8 @@ agent-browser wait --load networkidle
 agent-browser screenshot --annotate
 agent-browser snapshot -i
 agent-browser close
-kill $DEV_PID
+kill $DEV_PID 2>/dev/null
+pkill -P $DEV_PID 2>/dev/null || true
 ```
 
 - [ ] **4.2.10** Fix any issues found, re-run failing steps, commit fixes

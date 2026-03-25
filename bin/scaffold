@@ -395,7 +395,7 @@ Created with create-project scaffold tool"
             print_step "Pushing to existing repository..."
             git remote add origin "$repo_url.git" 2>/dev/null || git remote set-url origin "$repo_url.git"
             git branch -M main
-            git push -u origin main --force
+            git push -u origin main --force-with-lease
             print_success "Pushed to: $repo_url"
         fi
     elif confirm "Create private GitHub repository?"; then

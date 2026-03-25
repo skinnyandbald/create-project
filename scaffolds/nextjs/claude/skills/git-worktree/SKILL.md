@@ -109,7 +109,7 @@ npm install  # if needed
 npm run dev
 
 # Return to project root and cleanup when done
-cd "$PROJECT_ROOT"
+cd "$(git rev-parse --show-toplevel)"
 bash .claude/skills/git-worktree/scripts/worktree-manager.sh cleanup
 ```
 

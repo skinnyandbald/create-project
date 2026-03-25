@@ -20,7 +20,7 @@
 
 ---
 
-### Steps
+## Steps
 
 - [ ] **1.4.1** Create `src/lib/trpc/client.tsx` — tRPC React Query provider. Verify exact imports from `@trpc/tanstack-react-query` (v11 renamed this). Must export `Providers` component and `useTRPC` hook.
 

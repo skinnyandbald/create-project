@@ -31,7 +31,7 @@ Maintain structured state files for long-running tasks:
    ```
 
 2. **progress.txt** - Freeform progress notes:
-   ```
+   ```text
    Session N progress:
    - Completed X
    - Next: Y

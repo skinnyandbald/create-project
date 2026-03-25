@@ -28,7 +28,7 @@ git diff --name-only main...HEAD 2>/dev/null || git diff --name-only origin/main
 
 2. Use the Task tool to run the code-simplifier agent:
 
-```
+```text
 Task tool with subagent_type: code-simplifier:code-simplifier
 ```
 
@@ -53,7 +53,7 @@ Task tool with subagent_type: code-simplifier:code-simplifier
 
 ## Usage Examples
 
-```
+```text
 /simplify              # Simplify branch changes vs main
 /simplify staged       # Only staged changes
 /simplify file:src/lib/utils.ts  # Specific file

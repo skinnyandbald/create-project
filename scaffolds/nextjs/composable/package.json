@@ -33,6 +33,7 @@
     "vitest": "^3.1.0"
   },
   "scripts": {
+    "prepare": "husky",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",

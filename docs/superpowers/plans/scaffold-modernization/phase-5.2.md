@@ -14,7 +14,7 @@
 
 ---
 
-### Steps
+## Steps
 
 - [ ] **5.2.1** Update CLI usage section — replace `--type=t3` with `--type=nextjs`, document `--composable` flag, keep `--type=t3` as mentioned alias
 

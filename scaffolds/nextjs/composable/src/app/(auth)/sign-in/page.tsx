@@ -7,9 +7,12 @@ export default function SignInPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   async function handleSignIn(e: React.FormEvent) {
     e.preventDefault();
+    setError(null);
+    setIsLoading(true);
     await authClient.signIn.email(
       { email, password },
       {
@@ -18,6 +21,7 @@ export default function SignInPage() {
         },
         onError: (ctx) => {
           setError(ctx.error.message);
+          setIsLoading(false);
         },
       },
     );
@@ -46,9 +50,10 @@ export default function SignInPage() {
         />
         <button
           type="submit"
-          className="w-full rounded bg-foreground py-2 font-medium text-background"
+          disabled={isLoading}
+          className="w-full rounded bg-foreground py-2 font-medium text-background disabled:opacity-50"
         >
-          Sign In
+          {isLoading ? "Signing in\u2026" : "Sign In"}
         </button>
         <p className="text-center text-sm">
           No account?{" "}

@@ -23,7 +23,7 @@ All under `scaffolds/nextjs/composable/`:
 
 ---
 
-### Steps
+## Steps
 
 - [ ] **5.1.1** Research Better Auth + Next.js 16 integration — verify current API via `vibe-tools web "Better Auth Next.js 16 proxy.ts setup March 2026"`
 

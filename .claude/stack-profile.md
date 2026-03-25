@@ -15,7 +15,7 @@ Bash CLI scaffold tool generating Next.js 16, TypeScript 6, tRPC 11, Supabase, Z
 - Next.js 16: proxy.ts (not middleware.ts), async request APIs, Cache Components
 - Supabase: createServerClient with cookie handling, RLS-first auth
 - tRPC v11: inputSchema, Standard Schema, RSC prefetching
-- Zod 4: top-level validators, { error: } syntax, .prefault() for input defaults
+- Zod 4: top-level validators, { error: } syntax, .default() for input defaults
 - TypeScript 6: explicit types array, no baseUrl, moduleResolution: bundler
 - Biome 2: includes field, linter.domains, assist.actions.source
 

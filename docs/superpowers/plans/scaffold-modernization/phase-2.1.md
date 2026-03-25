@@ -19,7 +19,7 @@
 
 ---
 
-### Steps
+## Steps
 
 - [ ] **2.1.1** Create `proxy.ts` — copy exact code from spec. Critical details:
   - Export function named `proxy` (not `middleware`)

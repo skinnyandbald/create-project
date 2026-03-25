@@ -66,8 +66,8 @@ In any Claude Code session:
 
 | Type | Stack | Deployment |
 |------|-------|------------|
-| **Next.js** | Next.js 16, TypeScript 6, Tailwind v4, tRPC v11, Supabase, Biome v2 | Vercel |
-| **Next.js `--composable`** | Next.js 16, TypeScript 6, Tailwind v4, tRPC v11, Better Auth, Drizzle, Neon, Biome v2 | Vercel |
+| **Next.js** | Next.js 16, TypeScript 6, Tailwind v4, tRPC v11, Supabase, Zod 4, Vitest, Biome v2 | Vercel |
+| **Next.js `--composable`** | Next.js 16, TypeScript 6, Tailwind v4, tRPC v11, Better Auth, Drizzle, Neon, Zod 4, Vitest, Biome v2 | Vercel |
 | **Laravel** | Laravel, Inertia, React, TypeScript | Laravel Cloud |
 | **Discovery** | Requirements gathering only | N/A |
 

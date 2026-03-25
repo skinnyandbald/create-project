@@ -26,7 +26,7 @@ All under `scaffolds/nextjs/template/`:
 
 ---
 
-### Steps
+## Steps
 
 - [ ] **1.1.1** Create directory: `mkdir -p scaffolds/nextjs/template`
 - [ ] **1.1.2** Create `package.json` — copy exact JSON from spec (includes `{{PROJECT_NAME}}`, `"private": true`, engines, all deps, all scripts)
@@ -36,7 +36,7 @@ All under `scaffolds/nextjs/template/`:
 - [ ] **1.1.6** Create `vitest.config.ts` — copy from spec (jsdom, @/ alias)
 - [ ] **1.1.7** Create `postcss.config.mjs` — copy from spec (@tailwindcss/postcss)
 - [ ] **1.1.8** Create `.gitignore`:
-```
+```gitignore
 node_modules/
 .next/
 .env

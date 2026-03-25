@@ -19,7 +19,7 @@
 
 ---
 
-### Steps
+## Steps
 
 - [ ] **2.2.1** Create `src/app/globals.css` — copy from spec:
 ```css

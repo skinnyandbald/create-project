@@ -21,6 +21,10 @@ if [[ "$FILE_PATH" == *"node_modules"* ]] || [[ "$FILE_PATH" == *"generated"* ]]
   exit 0
 fi
 
+if [ -z "$CLAUDE_PROJECT_DIR" ]; then
+  exit 0
+fi
+
 OUTPUT=$(cd "$CLAUDE_PROJECT_DIR" && npx @biomejs/biome check --no-errors-on-unmatched "$FILE_PATH" 2>&1)
 EXIT_CODE=$?
 

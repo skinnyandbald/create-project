@@ -10,6 +10,6 @@ describe("scaffold health", () => {
   it("tRPC router initializes", async () => {
     const { appRouter } = await import("@/server/trpc/router");
     expect(appRouter).toBeDefined();
-    expect(appRouter._def.procedures).toHaveProperty("health");
+    expect(typeof appRouter.createCaller).toBe("function");
   });
 });

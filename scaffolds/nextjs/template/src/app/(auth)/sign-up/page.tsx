@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/browser";
 
@@ -26,9 +27,9 @@ export default function SignUpPage() {
         <div className="w-full max-w-sm space-y-4 text-center">
           <h1 className="text-2xl font-bold">Check your email</h1>
           <p className="text-sm">We sent you a confirmation link.</p>
-          <a href="/sign-in" className="text-sm underline">
+          <Link href="/sign-in" className="text-sm underline">
             Back to sign in
-          </a>
+          </Link>
         </div>
       </div>
     );
@@ -63,9 +64,9 @@ export default function SignUpPage() {
         </button>
         <p className="text-center text-sm">
           Already have an account?{" "}
-          <a href="/sign-in" className="underline">
+          <Link href="/sign-in" className="underline">
             Sign in
-          </a>
+          </Link>
         </p>
       </form>
     </div>
