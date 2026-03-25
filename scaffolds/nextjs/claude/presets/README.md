@@ -19,10 +19,10 @@ Copy the directives from your chosen preset directly into your project's `CLAUDE
 
 ```bash
 # View preset content
-cat scaffolds/t3/presets/coding-agent.md
+cat scaffolds/nextjs/claude/presets/coding-agent.md
 
 # Append to your CLAUDE.md
-cat scaffolds/t3/presets/coding-agent.md >> your-project/CLAUDE.md
+cat scaffolds/nextjs/claude/presets/coding-agent.md >> your-project/CLAUDE.md
 ```
 
 ### Option 2: Mix and match

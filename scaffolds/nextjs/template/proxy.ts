@@ -30,7 +30,7 @@ export async function proxy(request: NextRequest) {
   if (request.nextUrl.pathname.startsWith("/dashboard") && !user) {
     const redirectRes = NextResponse.redirect(new URL("/sign-in", request.url));
     for (const cookie of response.cookies.getAll()) {
-      redirectRes.cookies.set(cookie.name, cookie.value);
+      redirectRes.cookies.set(cookie);
     }
     return redirectRes;
   }

@@ -268,7 +268,7 @@ scaffold_laravel() {
     print_step "Setting up Claude Code..."
     mkdir -p .claude/commands
     cp "$SCAFFOLDS_DIR/laravel/CLAUDE.md" ./CLAUDE.md
-    sed -i '' "s/{{PROJECT_NAME}}/$project_name/g" ./CLAUDE.md
+    perl -pi -e "s/{{PROJECT_NAME}}/$project_name/g" ./CLAUDE.md
     cp "$SCAFFOLDS_DIR/laravel/settings.json" .claude/settings.json
     cp "$SCAFFOLDS_DIR/laravel/mcp.json" .claude/mcp.json
     cp "$SCAFFOLDS_DIR/laravel/claudeignore" .claudeignore
@@ -295,7 +295,7 @@ scaffold_discovery() {
 
     # Copy Claude setup
     cp "$SCAFFOLDS_DIR/discovery/CLAUDE.md" "$project_path/.claude/CLAUDE.md"
-    sed -i '' "s/{{PROJECT_NAME}}/$project_name/g" "$project_path/.claude/CLAUDE.md"
+    perl -pi -e "s/{{PROJECT_NAME}}/$project_name/g" "$project_path/.claude/CLAUDE.md"
 
     # Also create a symlink at the root for convenience
     ln -sf .claude/CLAUDE.md "$project_path/CLAUDE.md"

@@ -241,7 +241,7 @@ cleanup_worktrees() {
     local name=$(basename "$worktree_path")
 
     # Check for uncommitted changes before force removal
-    if git -C "$worktree_path" diff --quiet && git -C "$worktree_path" diff --cached --quiet 2>/dev/null; then
+    if git -C "$worktree_path" diff --quiet && git -C "$worktree_path" diff --cached --quiet && [ -z "$(git -C "$worktree_path" status --porcelain 2>/dev/null)" ]; then
       git worktree remove "$worktree_path" --force 2>/dev/null || true
       echo -e "${GREEN}Removed: $name${NC}"
     else

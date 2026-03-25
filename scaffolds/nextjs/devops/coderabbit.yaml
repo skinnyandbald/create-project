@@ -89,7 +89,7 @@ reviews:
         - Supabase and external service proxying
         - Security of proxied endpoints
 
-    - path: "src/server/api/**"
+    - path: "src/server/trpc/**"
       instructions: |
         Review:
         - tRPC v11 router and procedure patterns
