@@ -1,0 +1,41 @@
+scaffolds/nextjs/devops/coderabbit.yaml
+  2422cd8c9d295af5 92
+scaffolds/nextjs/template/src/app/(auth)/callback/route.ts
+  2422cd8c9d295af5 9-10,30
+scaffolds/nextjs/claude/mcp.json
+  2422cd8c9d295af5 5
+scaffolds/nextjs/template/proxy.ts
+  2422cd8c9d295af5 33
+scaffolds/nextjs/composable/src/server/trpc/router.ts
+  2422cd8c9d295af5 1,4-13,15,19
+bin/scaffold
+  2422cd8c9d295af5 271,298
+scaffolds/nextjs/devops/.github/workflows/claude-code-review.yml
+  2422cd8c9d295af5 5,22
+scaffolds/nextjs/claude/skills/git-worktree/scripts/worktree-manager.sh
+  2422cd8c9d295af5 244
+scaffolds/nextjs/claude/presets/README.md
+  2422cd8c9d295af5 22,25
+scaffolds/nextjs/composable/drizzle.config.ts
+  2422cd8c9d295af5 8
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.18",
+  "base_commit_sha": "5ca4e01a5ba560296ee45bbbf6eb576e06af50ed",
+  "prompts": {
+    "2422cd8c9d295af5": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8b9f70c3-cd22-458b-967e-b7b6a757e86c",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Ben Fisher <ben@skinnyandbald.com>",
+      "messages": [],
+      "total_additions": 27,
+      "total_deletions": 14,
+      "accepted_lines": 27,
+      "overriden_lines": 0
+    }
+  }
+}
