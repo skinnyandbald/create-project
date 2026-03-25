@@ -1,0 +1,87 @@
+scaffolds/nextjs/template/src/server/trpc/router.ts
+  2422cd8c9d295af5 1,4-13,15,19-20
+docs/superpowers/plans/scaffold-modernization/phase-3.2.md
+  2422cd8c9d295af5 24
+.beads/issues.jsonl
+  2422cd8c9d295af5 1-13
+scaffolds/nextjs/claude/presets/long-horizon-agent.md
+  2422cd8c9d295af5 34
+docs/superpowers/plans/scaffold-modernization/phase-4.1.md
+  2422cd8c9d295af5 47,61,70
+scaffolds/nextjs/claude/presets/README.md
+  2422cd8c9d295af5 22,25
+docs/superpowers/plans/scaffold-modernization/phase-1.3.md
+  2422cd8c9d295af5 20,67-69,71,75
+scaffolds/nextjs/claude/claudeignore
+  2422cd8c9d295af5 4
+scaffolds/nextjs/claude/skills/git-worktree/scripts/worktree-manager.sh
+  2422cd8c9d295af5 111,116,121
+scaffolds/nextjs/composable/package.json
+  2422cd8c9d295af5 36
+scaffolds/nextjs/claude/hooks/lint-after-edit.sh
+  2422cd8c9d295af5 24-27
+scaffolds/nextjs/template/package.json
+  2422cd8c9d295af5 33-35,37
+scaffolds/nextjs/claude/commands/simplify.md
+  2422cd8c9d295af5 31,56
+scaffolds/nextjs/composable/src/lib/db/schema.ts
+  2422cd8c9d295af5 1,13-29,32-53,56-68
+scaffolds/nextjs/claude/CLAUDE.md
+  2422cd8c9d295af5 492
+.claude/stack-profile.md
+  2422cd8c9d295af5 18
+scaffolds/nextjs/composable/src/app/(auth)/sign-in/page.tsx
+  2422cd8c9d295af5 10,14-15,24,53-54,56
+scaffolds/nextjs/claude/mcp.json
+  2422cd8c9d295af5 5,9
+docs/superpowers/plans/scaffold-modernization/phase-2.3.md
+  2422cd8c9d295af5 33
+scaffolds/nextjs/template/src/app/(auth)/sign-in/page.tsx
+  2422cd8c9d295af5 10,15-16,23,52-53,55
+scaffolds/nextjs/template/src/app/page.tsx
+  2422cd8c9d295af5 1-2,11,16-17,19
+scaffolds/nextjs/template/src/app/dashboard/page.tsx
+  2422cd8c9d295af5 9,12-14
+.beads/hooks/prepare-commit-msg
+  2422cd8c9d295af5 3,24
+scaffolds/nextjs/template/src/__tests__/smoke.test.ts
+  2422cd8c9d295af5 13
+scaffolds/nextjs/claude/hooks/typecheck-before-commit.sh
+  2422cd8c9d295af5 17
+scaffolds/nextjs/claude/skills/git-worktree/SKILL.md
+  2422cd8c9d295af5 112
+docs/superpowers/plans/scaffold-modernization/phase-1.1.md
+  2422cd8c9d295af5 39
+scaffolds/nextjs/template/src/app/(auth)/sign-up/page.tsx
+  2422cd8c9d295af5 3,30,32,67,69
+scaffolds/nextjs/composable/src/app/(auth)/sign-up/page.tsx
+  2422cd8c9d295af5 11,15-16,25,62-63,65
+scaffolds/nextjs/composable/src/app/dashboard/page.tsx
+  2422cd8c9d295af5 2,12-15,19
+docs/superpowers/plans/scaffold-modernization/phase-4.2.md
+  2422cd8c9d295af5 11,67-68
+bin/scaffold
+  2422cd8c9d295af5 398
+README.md
+  2422cd8c9d295af5 69-70
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.18",
+  "base_commit_sha": "09aa42e7bad62223c13e5042957b144a5894e156",
+  "prompts": {
+    "2422cd8c9d295af5": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8b9f70c3-cd22-458b-967e-b7b6a757e86c",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Ben Fisher <ben@skinnyandbald.com>",
+      "messages": [],
+      "total_additions": 171,
+      "total_deletions": 98,
+      "accepted_lines": 168,
+      "overriden_lines": 0
+    }
+  }
+}
