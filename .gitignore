@@ -7,3 +7,6 @@ Thumbs.db
 *.swo
 .idea/
 .vscode/
+
+# Test coverage
+coverage/

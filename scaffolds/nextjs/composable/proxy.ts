@@ -1,3 +1,5 @@
+// Scaffold template file — copied into generated projects by create-project.
+// Not imported by other source files. Do not remove based on static analysis.
 import { type NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 
