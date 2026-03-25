@@ -14,7 +14,7 @@ export function getDb() {
   return _db;
 }
 
-/** @deprecated Use `getDb()` for lazy initialization. This getter exists for convenience. */
+/** A proxy that provides a lazily-initialized singleton instance of the database client. For explicit initialization, use `getDb()`. */
 export const db = new Proxy({} as NeonHttpDatabase<typeof schema>, {
   get(_, prop) {
     return Reflect.get(getDb(), prop);

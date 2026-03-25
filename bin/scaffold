@@ -182,7 +182,9 @@ scaffold_nextjs() {
     # 2. Composable overlay
     if [ "$composable" = "true" ]; then
         print_step "Applying composable variant (Better Auth + Drizzle + Neon)..."
-        cp -r "$SCAFFOLDS_DIR/nextjs/composable/"* "$TARGET_DIR/" 2>/dev/null || true
+        if [ -d "$SCAFFOLDS_DIR/nextjs/composable" ] && [ "$(ls -A "$SCAFFOLDS_DIR/nextjs/composable")" ]; then
+            cp -r "$SCAFFOLDS_DIR/nextjs/composable/"* "$TARGET_DIR/"
+        fi
         # Remove Supabase-specific files that the composable variant replaces
         rm -rf "$TARGET_DIR/src/lib/supabase"
         rm -rf "$TARGET_DIR/src/app/(auth)/callback"
@@ -194,7 +196,7 @@ scaffold_nextjs() {
     cp -r "$SCAFFOLDS_DIR/nextjs/claude/"* "$TARGET_DIR/.claude/"
     # Move CLAUDE.md to project root
     mv "$TARGET_DIR/.claude/CLAUDE.md" "$TARGET_DIR/CLAUDE.md"
-    chmod +x "$TARGET_DIR/.claude/hooks/"*.sh 2>/dev/null || true
+    find "$TARGET_DIR/.claude/hooks" -name "*.sh" -exec chmod +x {} + 2>/dev/null
 
     # 4. DevOps
     print_step "Setting up DevOps..."
@@ -212,16 +214,18 @@ scaffold_nextjs() {
         -name "*.ts" -o -name "*.tsx" -o -name "*.json" -o \
         -name "*.md" -o -name "*.yaml" -o -name "*.yml" -o \
         -name "*.css" -o -name ".env.example" \
-    \) -exec sed -i '' "s/{{PROJECT_NAME}}/$project_name/g" {} +
+    \) -exec perl -pi -e "s/{{PROJECT_NAME}}/$project_name/g" {} +
 
-    # 6. Install
-    print_step "Installing dependencies with pnpm..."
+    # 6. Install & Git Hooks
+    print_step "Initializing git repository..."
     cd "$TARGET_DIR"
-    pnpm install
+    git init
 
-    # 7. Initialize husky
     print_step "Setting up git hooks..."
-    npx husky init 2>/dev/null || true
+    npx husky init
+
+    print_step "Installing dependencies with pnpm..."
+    pnpm install
 
     # 8. Success — remove trap
     trap - ERR INT TERM
