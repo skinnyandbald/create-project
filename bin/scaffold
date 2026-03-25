@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -e
+set -euo pipefail
 
 # Colors
 RED='\033[0;31m'
@@ -92,7 +92,7 @@ validate_project_path() {
 # Prompt for input with default
 prompt() {
     local prompt_text="$1"
-    local default="$2"
+    local default="${2:-}"
     local result
 
     if [ -n "$default" ]; then
@@ -160,75 +160,81 @@ check_existing_project() {
     return 0  # No project
 }
 
-# Scaffold T3 project
-scaffold_t3() {
+# Scaffold Next.js project
+scaffold_nextjs() {
     local project_name="$1"
-    local project_path="$PROJECT_DIR/$project_name"
+    local composable="${2:-false}"
+    local TARGET_DIR="$PROJECT_DIR/$project_name"
 
-    print_step "Creating T3 project with create-t3-app..."
+    # Safety trap
+    trap '[[ -n "${TARGET_DIR:-}" ]] && [[ "$TARGET_DIR" != "/" ]] && rm -rf "$TARGET_DIR"' ERR INT TERM
 
-    cd "$PROJECT_DIR"
-    npx create-t3-app@latest "$project_name" \
-        --CI \
-        --noGit \
-        --appRouter \
-        --tailwind \
-        --trpc \
-        --prisma \
-        --nextAuth \
-        --dbProvider postgres
+    # Validate target doesn't exist
+    if [ -d "$TARGET_DIR" ]; then
+        print_error "Directory $TARGET_DIR already exists"
+        exit 1
+    fi
 
-    cd "$project_path"
+    # 1. Copy template
+    print_step "Creating Next.js project..."
+    cp -r "$SCAFFOLDS_DIR/nextjs/template" "$TARGET_DIR"
 
-    # Install UI kit packages
-    print_step "Installing UI kit packages..."
-    npm install lucide-react class-variance-authority clsx tailwind-merge sonner next-themes @radix-ui/react-slot @radix-ui/react-tooltip
+    # 2. Composable overlay
+    if [ "$composable" = "true" ]; then
+        print_step "Applying composable variant (Better Auth + Drizzle + Neon)..."
+        if [ -d "$SCAFFOLDS_DIR/nextjs/composable" ] && [ "$(ls -A "$SCAFFOLDS_DIR/nextjs/composable")" ]; then
+            cp -r "$SCAFFOLDS_DIR/nextjs/composable/"* "$TARGET_DIR/"
+        fi
+        # Remove Supabase-specific files that the composable variant replaces
+        rm -rf "$TARGET_DIR/src/lib/supabase"
+        rm -rf "$TARGET_DIR/src/app/(auth)/callback"
+    fi
 
-    # Install testing packages
-    print_step "Installing testing packages..."
-    npm install -D vitest @vitest/ui @testing-library/react @testing-library/jest-dom @playwright/test husky lint-staged
-    npm install -D -E @biomejs/biome
-
-    # Copy Claude setup
+    # 3. Claude configs
     print_step "Setting up Claude Code..."
-    mkdir -p .claude/commands .claude/skills .claude/hooks
-    cp "$SCAFFOLDS_DIR/t3/CLAUDE.md" ./CLAUDE.md
-    sed -i '' "s/{{PROJECT_NAME}}/$project_name/g" ./CLAUDE.md
-    cp "$SCAFFOLDS_DIR/t3/settings.json" .claude/settings.json
-    cp "$SCAFFOLDS_DIR/t3/mcp.json" .claude/mcp.json
-    cp "$SCAFFOLDS_DIR/t3/claudeignore" .claudeignore
-    # Copy Claude hooks (lint-after-edit, typecheck-before-commit)
-    if [ -d "$SCAFFOLDS_DIR/t3/hooks" ] && [ "$(ls -A "$SCAFFOLDS_DIR/t3/hooks" 2>/dev/null)" ]; then
-        cp "$SCAFFOLDS_DIR/t3/hooks/"*.sh .claude/hooks/
-        chmod +x .claude/hooks/*.sh
-    fi
-    # Copy Claude commands
-    if [ -d "$SCAFFOLDS_DIR/t3/commands" ] && [ "$(ls -A "$SCAFFOLDS_DIR/t3/commands" 2>/dev/null)" ]; then
-        cp -r "$SCAFFOLDS_DIR/t3/commands/"* .claude/commands/
-    fi
-    # Copy Claude skills
-    if [ -d "$SCAFFOLDS_DIR/t3/skills" ] && [ "$(ls -A "$SCAFFOLDS_DIR/t3/skills" 2>/dev/null)" ]; then
-        cp -r "$SCAFFOLDS_DIR/t3/skills/"* .claude/skills/
-    fi
+    mkdir -p "$TARGET_DIR/.claude/hooks" "$TARGET_DIR/.claude/commands" "$TARGET_DIR/.claude/skills" "$TARGET_DIR/.claude/presets"
+    cp -r "$SCAFFOLDS_DIR/nextjs/claude/"* "$TARGET_DIR/.claude/"
+    # Move CLAUDE.md to project root
+    mv "$TARGET_DIR/.claude/CLAUDE.md" "$TARGET_DIR/CLAUDE.md"
+    find "$TARGET_DIR/.claude/hooks" -name "*.sh" -exec chmod +x {} + 2>/dev/null
 
-    # Copy devops
+    # 4. DevOps
     print_step "Setting up DevOps..."
-    mkdir -p .github/workflows
-    cp "$SCAFFOLDS_DIR/t3/devops/coderabbit.yaml" .coderabbit.yaml
-    cp "$SCAFFOLDS_DIR/t3/devops/vercel.json" ./vercel.json
-    cp "$SCAFFOLDS_DIR/t3/devops/workflows/"*.yml .github/workflows/
-    cp "$SCAFFOLDS_DIR/t3/devops/PULL_REQUEST_TEMPLATE.md" .github/
+    cp "$SCAFFOLDS_DIR/nextjs/devops/vercel.json" "$TARGET_DIR/"
+    cp "$SCAFFOLDS_DIR/nextjs/devops/coderabbit.yaml" "$TARGET_DIR/.coderabbit.yaml"
+    mkdir -p "$TARGET_DIR/.github/workflows"
+    cp "$SCAFFOLDS_DIR/nextjs/devops/.github/workflows/"*.yml "$TARGET_DIR/.github/workflows/"
+    if [ -f "$SCAFFOLDS_DIR/nextjs/devops/PULL_REQUEST_TEMPLATE.md" ]; then
+        cp "$SCAFFOLDS_DIR/nextjs/devops/PULL_REQUEST_TEMPLATE.md" "$TARGET_DIR/.github/"
+    fi
 
-    # Copy Biome config
-    print_step "Setting up Biome..."
-    cp "$SCAFFOLDS_DIR/t3/extras/biome.json" ./biome.json
+    # 5. String replace (allowlisted extensions only)
+    print_step "Configuring project name..."
+    find "$TARGET_DIR" -type f \( \
+        -name "*.ts" -o -name "*.tsx" -o -name "*.json" -o \
+        -name "*.md" -o -name "*.yaml" -o -name "*.yml" -o \
+        -name "*.css" -o -name ".env.example" \
+    \) -exec perl -pi -e "s/{{PROJECT_NAME}}/$project_name/g" {} +
 
-    # Initialize husky + pre-commit hooks (lint-staged + typecheck)
+    # 6. Install & Git Hooks
+    print_step "Initializing git repository..."
+    cd "$TARGET_DIR"
+    git init
+
     print_step "Setting up git hooks..."
     npx husky init
-    cp "$SCAFFOLDS_DIR/t3/extras/.husky/pre-commit" .husky/pre-commit
 
-    print_success "T3 project created!"
+    print_step "Installing dependencies with pnpm..."
+    pnpm install
+
+    # 8. Success — remove trap
+    trap - ERR INT TERM
+    print_success "Next.js project created at $TARGET_DIR"
+}
+
+# Keep scaffold_t3 as alias for backward compatibility
+scaffold_t3() {
+    scaffold_nextjs "$@"
 }
 
 # Scaffold Laravel project
@@ -262,7 +268,7 @@ scaffold_laravel() {
     print_step "Setting up Claude Code..."
     mkdir -p .claude/commands
     cp "$SCAFFOLDS_DIR/laravel/CLAUDE.md" ./CLAUDE.md
-    sed -i '' "s/{{PROJECT_NAME}}/$project_name/g" ./CLAUDE.md
+    perl -pi -e "s/{{PROJECT_NAME}}/$project_name/g" ./CLAUDE.md
     cp "$SCAFFOLDS_DIR/laravel/settings.json" .claude/settings.json
     cp "$SCAFFOLDS_DIR/laravel/mcp.json" .claude/mcp.json
     cp "$SCAFFOLDS_DIR/laravel/claudeignore" .claudeignore
@@ -289,7 +295,7 @@ scaffold_discovery() {
 
     # Copy Claude setup
     cp "$SCAFFOLDS_DIR/discovery/CLAUDE.md" "$project_path/.claude/CLAUDE.md"
-    sed -i '' "s/{{PROJECT_NAME}}/$project_name/g" "$project_path/.claude/CLAUDE.md"
+    perl -pi -e "s/{{PROJECT_NAME}}/$project_name/g" "$project_path/.claude/CLAUDE.md"
 
     # Also create a symlink at the root for convenience
     ln -sf .claude/CLAUDE.md "$project_path/CLAUDE.md"
@@ -321,7 +327,7 @@ upgrade_project() {
     print_header "Upgrading $project_name"
 
     local stack
-    stack=$(select_option "Select stack:" "T3 (Next.js)" "Laravel")
+    stack=$(select_option "Select stack:" "Next.js (Supabase + tRPC + Tailwind)" "Laravel")
 
     # Backup the ENTIRE project, not just requirements
     print_step "Backing up existing project..."
@@ -336,8 +342,8 @@ upgrade_project() {
 
     # Create new project
     case "$stack" in
-        "T3 (Next.js)")
-            scaffold_t3 "$project_name"
+        "Next.js (Supabase + tRPC + Tailwind)")
+            scaffold_nextjs "$project_name"
             ;;
         "Laravel")
             scaffold_laravel "$project_name"
@@ -389,7 +395,7 @@ Created with create-project scaffold tool"
             print_step "Pushing to existing repository..."
             git remote add origin "$repo_url.git" 2>/dev/null || git remote set-url origin "$repo_url.git"
             git branch -M main
-            git push -u origin main --force
+            git push -u origin main --force-with-lease
             print_success "Pushed to: $repo_url"
         fi
     elif confirm "Create private GitHub repository?"; then
@@ -406,12 +412,17 @@ main() {
     local project_name=""
     local project_type=""
     local upgrade_mode=false
+    local composable=false
 
     # Parse arguments
     while [[ $# -gt 0 ]]; do
         case $1 in
             --type=*)
                 project_type="${1#*=}"
+                shift
+                ;;
+            --composable)
+                composable=true
                 shift
                 ;;
             --upgrade)
@@ -474,13 +485,13 @@ main() {
 
     # Get project type if not provided
     if [ -z "$project_type" ]; then
-        project_type=$(select_option "Select project type:" "T3 (Next.js)" "Laravel" "Discovery")
+        project_type=$(select_option "Select project type:" "Next.js (Supabase + tRPC + Tailwind)" "Laravel" "Discovery")
     fi
 
     # Scaffold based on type
     case "$project_type" in
-        t3|"T3"|"T3 (Next.js)")
-            scaffold_t3 "$project_name"
+        nextjs|t3|"T3"|"T3 (Next.js)"|"Next.js (Supabase + tRPC + Tailwind)")
+            scaffold_nextjs "$project_name" "$composable"
             ;;
         laravel|"Laravel")
             scaffold_laravel "$project_name"
