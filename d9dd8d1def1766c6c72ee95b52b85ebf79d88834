@@ -1,0 +1,27 @@
+scaffolds/nextjs/composable/proxy.ts
+  bdb033f1c671dc79 1-2
+.gitignore
+  bdb033f1c671dc79 10-12
+.github/workflows/claude-code-review.yml
+  bdb033f1c671dc79 4-5
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.19",
+  "base_commit_sha": "d9dd8d1def1766c6c72ee95b52b85ebf79d88834",
+  "prompts": {
+    "bdb033f1c671dc79": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ae91a052-87e0-42b9-b7a8-8820c702539e",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Ben Fisher <ben@skinnyandbald.com>",
+      "messages": [],
+      "total_additions": 7,
+      "total_deletions": 0,
+      "accepted_lines": 7,
+      "overriden_lines": 0
+    }
+  }
+}
