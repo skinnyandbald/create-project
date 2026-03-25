@@ -1,0 +1,21 @@
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.19",
+  "base_commit_sha": "63ab3cc20459689e17cc9faa2819186a9f311749",
+  "prompts": {
+    "bdb033f1c671dc79": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ae91a052-87e0-42b9-b7a8-8820c702539e",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Ben Fisher <ben@skinnyandbald.com>",
+      "messages": [],
+      "total_additions": 0,
+      "total_deletions": 2,
+      "accepted_lines": 0,
+      "overriden_lines": 0
+    }
+  }
+}
