@@ -1,0 +1,37 @@
+scaffolds/nextjs/composable/src/lib/db/index.ts
+  2422cd8c9d295af5 17
+scaffolds/nextjs/template/proxy.ts
+  2422cd8c9d295af5 8-9
+scaffolds/nextjs/template/src/server/trpc/init.ts
+  2422cd8c9d295af5 10-11
+scaffolds/nextjs/template/src/lib/supabase/browser.ts
+  2422cd8c9d295af5 5-6
+scaffolds/nextjs/template/src/app/(auth)/callback/route.ts
+  2422cd8c9d295af5 13-14
+scaffolds/nextjs/template/src/lib/supabase/server.ts
+  2422cd8c9d295af5 8-9
+bin/scaffold
+  2422cd8c9d295af5 185-187,199,217,219-220,222,225-228
+scaffolds/nextjs/template/src/lib/trpc/client.tsx
+  2422cd8c9d295af5 13
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.18",
+  "base_commit_sha": "0b7e1b67b75b683445043f68ea08a9d9e4c2262b",
+  "prompts": {
+    "2422cd8c9d295af5": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8b9f70c3-cd22-458b-967e-b7b6a757e86c",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Ben Fisher <ben@skinnyandbald.com>",
+      "messages": [],
+      "total_additions": 24,
+      "total_deletions": 19,
+      "accepted_lines": 24,
+      "overriden_lines": 0
+    }
+  }
+}
