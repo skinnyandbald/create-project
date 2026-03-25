@@ -1,0 +1,23 @@
+.beads/hooks/prepare-commit-msg
+  bdb033f1c671dc79 24-26
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.19",
+  "base_commit_sha": "3b99f8f0b11a7f4bfd2ec61918d5e6bef5c6ccae",
+  "prompts": {
+    "bdb033f1c671dc79": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ae91a052-87e0-42b9-b7a8-8820c702539e",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Ben Fisher <ben@skinnyandbald.com>",
+      "messages": [],
+      "total_additions": 3,
+      "total_deletions": 1,
+      "accepted_lines": 3,
+      "overriden_lines": 0
+    }
+  }
+}
