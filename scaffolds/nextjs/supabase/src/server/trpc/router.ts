@@ -17,10 +17,7 @@ export const appRouter = createTRPCRouter({
   }),
 
   me: protectedProcedure.output(meOutput).query(({ ctx }) => {
-    return {
-      id: ctx.session.user.id,
-      email: ctx.session.user.email,
-    };
+    return { id: ctx.user.id, email: ctx.user.email ?? null };
   }),
 });
 

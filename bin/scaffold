@@ -18,6 +18,13 @@ while [ -L "$SCRIPT_PATH" ]; do
 done
 SCRIPT_DIR="$(cd -P "$(dirname "$SCRIPT_PATH")" && pwd)"
 SCAFFOLDS_DIR="$(dirname "$SCRIPT_DIR")/scaffolds"
+SHARED_DIR="$(dirname "$SCRIPT_DIR")/scaffolds/shared"
+if [ -d "$SHARED_DIR" ]; then
+    SHARED_DIR="$(cd "$SHARED_DIR" && pwd)"
+else
+    # Shared dir may not exist in older installations
+    SHARED_DIR=""
+fi
 
 # Load config for PROJECT_DIR
 CONFIG_FILE="$HOME/.config/scaffold/config"
