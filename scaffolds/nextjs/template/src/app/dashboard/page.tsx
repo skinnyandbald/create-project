@@ -1,22 +1,22 @@
-import { createClient } from "@/lib/supabase/server";
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
+import { auth } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
 export default async function DashboardPage() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-    error,
-  } = await supabase.auth.getUser();
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
 
-  if (error) {
-    console.error("Failed to get user:", error.message);
+  if (!session?.user) {
+    redirect("/sign-in");
   }
 
   return (
     <div className="p-8">
       <h1 className="text-2xl font-bold">Dashboard</h1>
-      <p className="mt-2">Welcome, {user?.email}</p>
+      <p className="mt-2">Welcome, {session.user.email}</p>
     </div>
   );
 }

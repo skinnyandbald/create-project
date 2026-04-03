@@ -1,30 +1,37 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
-import { authClient } from "@/lib/auth/client";
+import { createClient } from "@/lib/supabase/browser";
 
 export default function SignUpPage() {
-  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const supabase = createClient();
 
   async function handleSignUp(e: React.FormEvent) {
     e.preventDefault();
-    setError(null);
-    setIsLoading(true);
-    await authClient.signUp.email(
-      { name, email, password },
-      {
-        onSuccess: () => {
-          window.location.href = "/dashboard";
-        },
-        onError: (ctx) => {
-          setError(ctx.error.message);
-          setIsLoading(false);
-        },
-      },
+    const { error } = await supabase.auth.signUp({ email, password });
+    if (error) {
+      setError(error.message);
+    } else {
+      setSuccess(true);
+    }
+  }
+
+  if (success) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="w-full max-w-sm space-y-4 text-center">
+          <h1 className="text-2xl font-bold">Check your email</h1>
+          <p className="text-sm">We sent you a confirmation link.</p>
+          <Link href="/sign-in" className="text-sm underline">
+            Back to sign in
+          </Link>
+        </div>
+      </div>
     );
   }
 
@@ -33,14 +40,6 @@ export default function SignUpPage() {
       <form onSubmit={handleSignUp} className="w-full max-w-sm space-y-4">
         <h1 className="text-2xl font-bold">Sign Up</h1>
         {error && <p className="text-sm text-red-500">{error}</p>}
-        <input
-          type="text"
-          placeholder="Name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          className="w-full rounded border px-3 py-2"
-          required
-        />
         <input
           type="email"
           placeholder="Email"
@@ -59,16 +58,15 @@ export default function SignUpPage() {
         />
         <button
           type="submit"
-          disabled={isLoading}
-          className="w-full rounded bg-foreground py-2 font-medium text-background disabled:opacity-50"
+          className="w-full rounded bg-foreground py-2 font-medium text-background"
         >
-          {isLoading ? "Signing up\u2026" : "Sign Up"}
+          Sign Up
         </button>
         <p className="text-center text-sm">
           Already have an account?{" "}
-          <a href="/sign-in" className="underline">
+          <Link href="/sign-in" className="underline">
             Sign in
-          </a>
+          </Link>
         </p>
       </form>
     </div>

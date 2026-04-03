@@ -18,6 +18,13 @@ while [ -L "$SCRIPT_PATH" ]; do
 done
 SCRIPT_DIR="$(cd -P "$(dirname "$SCRIPT_PATH")" && pwd)"
 SCAFFOLDS_DIR="$(dirname "$SCRIPT_DIR")/scaffolds"
+SHARED_DIR="$(dirname "$SCRIPT_DIR")/scaffolds/shared"
+if [ -d "$SHARED_DIR" ]; then
+    SHARED_DIR="$(cd "$SHARED_DIR" && pwd)"
+else
+    # Shared dir may not exist in older installations
+    SHARED_DIR=""
+fi
 
 # Load config for PROJECT_DIR
 CONFIG_FILE="$HOME/.config/scaffold/config"
@@ -163,7 +170,8 @@ check_existing_project() {
 # Scaffold Next.js project
 scaffold_nextjs() {
     local project_name="$1"
-    local composable="${2:-false}"
+    local supabase="${2:-false}"
+    local no_security="${3:-false}"
     local TARGET_DIR="$PROJECT_DIR/$project_name"
 
     # Safety trap
@@ -179,15 +187,19 @@ scaffold_nextjs() {
     print_step "Creating Next.js project..."
     cp -r "$SCAFFOLDS_DIR/nextjs/template" "$TARGET_DIR"
 
-    # 2. Composable overlay
-    if [ "$composable" = "true" ]; then
-        print_step "Applying composable variant (Better Auth + Drizzle + Neon)..."
-        if [ -d "$SCAFFOLDS_DIR/nextjs/composable" ] && [ "$(ls -A "$SCAFFOLDS_DIR/nextjs/composable")" ]; then
-            cp -r "$SCAFFOLDS_DIR/nextjs/composable/"* "$TARGET_DIR/"
+    # 2. Supabase overlay (if requested)
+    if [ "$supabase" = "true" ]; then
+        print_step "Applying Supabase variant..."
+        if [ -d "$SCAFFOLDS_DIR/nextjs/supabase" ] && [ "$(ls -A "$SCAFFOLDS_DIR/nextjs/supabase")" ]; then
+            cp -R "$SCAFFOLDS_DIR/nextjs/supabase/." "$TARGET_DIR/"
         fi
-        # Remove Supabase-specific files that the composable variant replaces
-        rm -rf "$TARGET_DIR/src/lib/supabase"
-        rm -rf "$TARGET_DIR/src/app/(auth)/callback"
+        # Remove BetterAuth/Drizzle-specific files that Supabase replaces
+        rm -rf "$TARGET_DIR/src/lib/auth"
+        rm -rf "$TARGET_DIR/src/lib/db"
+        rm -rf "$TARGET_DIR/src/app/api/auth"
+        rm -f "$TARGET_DIR/drizzle.config.ts"
+        rm -f "$TARGET_DIR/proxy.ts"
+        rm -rf "$TARGET_DIR/drizzle"
     fi
 
     # 3. Claude configs
@@ -204,6 +216,15 @@ scaffold_nextjs() {
     cp "$SCAFFOLDS_DIR/nextjs/devops/coderabbit.yaml" "$TARGET_DIR/.coderabbit.yaml"
     mkdir -p "$TARGET_DIR/.github/workflows"
     cp "$SCAFFOLDS_DIR/nextjs/devops/.github/workflows/"*.yml "$TARGET_DIR/.github/workflows/"
+
+    # 5. Security scanning
+    if [ "$no_security" != "true" ] && [ -n "$SHARED_DIR" ]; then
+        print_step "Adding security scanning workflow..."
+        mkdir -p "$TARGET_DIR/.github/workflows"
+        cp "$SHARED_DIR/security/.github/workflows/security.yml" \
+           "$TARGET_DIR/.github/workflows/security.yml"
+    fi
+
     if [ -f "$SCAFFOLDS_DIR/nextjs/devops/PULL_REQUEST_TEMPLATE.md" ]; then
         cp "$SCAFFOLDS_DIR/nextjs/devops/PULL_REQUEST_TEMPLATE.md" "$TARGET_DIR/.github/"
     fi
@@ -240,6 +261,7 @@ scaffold_t3() {
 # Scaffold Laravel project
 scaffold_laravel() {
     local project_name="$1"
+    local no_security="${2:-false}"
     local project_path="$PROJECT_DIR/$project_name"
 
     print_step "Creating Laravel project..."
@@ -279,6 +301,14 @@ scaffold_laravel() {
     cp "$SCAFFOLDS_DIR/laravel/devops/coderabbit.yaml" .coderabbit.yaml
     cp "$SCAFFOLDS_DIR/laravel/devops/workflows/"*.yml .github/workflows/
     cp "$SCAFFOLDS_DIR/laravel/devops/PULL_REQUEST_TEMPLATE.md" .github/
+
+    # Security scanning
+    if [ "$no_security" != "true" ] && [ -n "$SHARED_DIR" ]; then
+        print_step "Adding security scanning workflow..."
+        mkdir -p "$project_path/.github/workflows"
+        cp "$SHARED_DIR/security/.github/workflows/security.yml" \
+           "$project_path/.github/workflows/security.yml"
+    fi
 
     print_success "Laravel project created!"
 }
@@ -327,7 +357,7 @@ upgrade_project() {
     print_header "Upgrading $project_name"
 
     local stack
-    stack=$(select_option "Select stack:" "Next.js (Supabase + tRPC + Tailwind)" "Laravel")
+    stack=$(select_option "Select stack:" "Next.js (Neon + BetterAuth + tRPC + Tailwind)" "Laravel")
 
     # Backup the ENTIRE project, not just requirements
     print_step "Backing up existing project..."
@@ -342,11 +372,11 @@ upgrade_project() {
 
     # Create new project
     case "$stack" in
-        "Next.js (Supabase + tRPC + Tailwind)")
-            scaffold_nextjs "$project_name"
+        "Next.js (Neon + BetterAuth + tRPC + Tailwind)")
+            scaffold_nextjs "$project_name" "false" "$no_security"
             ;;
         "Laravel")
-            scaffold_laravel "$project_name"
+            scaffold_laravel "$project_name" "$no_security"
             ;;
     esac
 
@@ -412,7 +442,9 @@ main() {
     local project_name=""
     local project_type=""
     local upgrade_mode=false
-    local composable=false
+    local supabase=false
+    local no_security=false
+    local composable_seen=false
 
     # Parse arguments
     while [[ $# -gt 0 ]]; do
@@ -421,8 +453,17 @@ main() {
                 project_type="${1#*=}"
                 shift
                 ;;
+            --supabase)
+                supabase=true
+                shift
+                ;;
+            --no-security)
+                no_security=true
+                shift
+                ;;
             --composable)
-                composable=true
+                composable_seen=true
+                print_warning "--composable is deprecated (now the default). Ignoring. Remove this flag from any CI scripts or aliases."
                 shift
                 ;;
             --upgrade)
@@ -439,6 +480,11 @@ main() {
                 ;;
         esac
     done
+
+    if [ "$supabase" = "true" ] && [ "$composable_seen" = "true" ]; then
+        print_error "--supabase and --composable are mutually exclusive."
+        exit 1
+    fi
 
     # Get project name if not provided
     if [ -z "$project_name" ]; then
@@ -485,16 +531,30 @@ main() {
 
     # Get project type if not provided
     if [ -z "$project_type" ]; then
-        project_type=$(select_option "Select project type:" "Next.js (Supabase + tRPC + Tailwind)" "Laravel" "Discovery")
+        project_type=$(select_option "Select project type:" "Next.js (Neon + BetterAuth + tRPC + Tailwind)" "Laravel" "Discovery")
+    fi
+
+    # Security scanning prompt (default yes, skip for Discovery)
+    if [ "$no_security" != "true" ]; then
+        case "$project_type" in
+            discovery|"Discovery") ;;
+            *)
+                if [ -t 0 ]; then
+                    if ! confirm "Add security scanning (Semgrep + Trivy + Gitleaks)?" "y"; then
+                        no_security=true
+                    fi
+                fi
+                ;;
+        esac
     fi
 
     # Scaffold based on type
     case "$project_type" in
-        nextjs|t3|"T3"|"T3 (Next.js)"|"Next.js (Supabase + tRPC + Tailwind)")
-            scaffold_nextjs "$project_name" "$composable"
+        nextjs|t3|"Next.js (Neon + BetterAuth + tRPC + Tailwind)")
+            scaffold_nextjs "$project_name" "$supabase" "$no_security"
             ;;
         laravel|"Laravel")
-            scaffold_laravel "$project_name"
+            scaffold_laravel "$project_name" "$no_security"
             ;;
         discovery|"Discovery")
             scaffold_discovery "$project_name"
