@@ -1,0 +1,25 @@
+.github/workflows/claude-code-review.yml
+  7c9085a4928aab1c 30,36
+.github/workflows/claude.yml
+  7c9085a4928aab1c 29,35
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.5",
+  "base_commit_sha": "bad3353ca0366d4b8f83a84a83f1dd570cffd9b4",
+  "prompts": {
+    "7c9085a4928aab1c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "30ac087f-3f76-4d02-bdd9-e4201d864bfc",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Ben Fisher",
+      "messages": [],
+      "total_additions": 4,
+      "total_deletions": 4,
+      "accepted_lines": 4,
+      "overriden_lines": 0
+    }
+  }
+}
