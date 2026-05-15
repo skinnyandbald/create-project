@@ -34,14 +34,14 @@ This will:
 # Interactive mode
 scaffold
 
-# Next.js (default)
+# Next.js (default: Better Auth + Drizzle + Neon)
 scaffold my-app
 
-# Explicit Next.js
-scaffold my-app --type=nextjs
+# Next.js with Supabase instead
+scaffold my-app --supabase
 
-# Next.js composable variant (Better Auth + Drizzle + Neon)
-scaffold my-app --composable
+# Next.js + provision cloud services via Stripe Projects
+scaffold my-app --provision
 
 # Laravel
 scaffold my-app --type=laravel
@@ -53,7 +53,7 @@ scaffold my-app --type=discovery
 scaffold my-app --upgrade
 ```
 
-> `--type=t3` is still accepted as an alias for `--type=nextjs`.
+> `--type=t3` and `--type=nextjs` are accepted as aliases. `--composable` is deprecated (composable is now the default).
 
 ### Claude Skill
 
@@ -66,8 +66,8 @@ In any Claude Code session:
 
 | Type | Stack | Deployment |
 |------|-------|------------|
-| **Next.js** | Next.js 16, TypeScript 6, Tailwind v4, tRPC v11, Supabase, Zod 4, Vitest, Biome v2 | Vercel |
-| **Next.js `--composable`** | Next.js 16, TypeScript 6, Tailwind v4, tRPC v11, Better Auth, Drizzle, Neon, Zod 4, Vitest, Biome v2 | Vercel |
+| **Next.js** (default) | Next.js 16, TypeScript 6, Tailwind v4, tRPC v11, Better Auth, Drizzle, Neon, Zod 4, Vitest, Biome v2 | Vercel |
+| **Next.js `--supabase`** | Next.js 16, TypeScript 6, Tailwind v4, tRPC v11, Supabase, Zod 4, Vitest, Biome v2 | Vercel |
 | **Laravel** | Laravel, Inertia, React, TypeScript | Laravel Cloud |
 | **Discovery** | Requirements gathering only | N/A |
 
@@ -83,7 +83,9 @@ In any Claude Code session:
 
 ### Next.js Projects
 - Next.js 16 (App Router, Turbopack, proxy.ts)
-- Supabase (Auth + Database + Storage)
+- Better Auth (authentication)
+- Drizzle ORM (database access)
+- Neon (serverless Postgres)
 - tRPC v11 (type-safe API)
 - Tailwind CSS v4 (CSS-first config)
 - Zod 4 (schema validation)
@@ -93,14 +95,31 @@ In any Claude Code session:
 - UI Kit: lucide, cva, clsx, tailwind-merge, sonner, next-themes, radix
 - `vercel.json` - Deployment config
 
-#### Composable variant (`--composable`)
+#### Supabase variant (`--supabase`)
 
-Replaces Supabase with a composable auth/database stack:
-- **Better Auth** instead of Supabase Auth
-- **Drizzle ORM** instead of Supabase client
-- **Neon** (serverless Postgres) instead of Supabase Database
+Replaces the default auth/database stack with Supabase:
+- **Supabase Auth** instead of Better Auth
+- **Supabase client** instead of Drizzle ORM
+- **Supabase Database** instead of Neon
 
 Everything else (tRPC, Tailwind, Biome, Vitest, etc.) stays the same.
+
+### Cloud Provisioning (`--provision`)
+
+Provisions cloud services via [Stripe Projects](https://projects.dev) after scaffolding. Currently supported for Next.js projects only.
+
+```bash
+scaffold my-app --provision
+```
+
+Interactively confirms each service before provisioning. Syncs credentials to `.env`.
+
+**Default stack:** Neon, Vercel, Sentry, PostHog
+**Supabase stack:** Supabase, Vercel, Sentry, PostHog
+
+Requires: Stripe CLI (`brew install stripe/stripe-cli/stripe`) with the projects plugin (`stripe plugin install projects`). You must be logged in (`stripe login`).
+
+**Note:** This provisions real cloud accounts. Some services may incur costs.
 
 ### Laravel Projects
 - Laravel + Breeze with React/Inertia

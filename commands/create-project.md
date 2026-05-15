@@ -8,9 +8,11 @@ You are helping the user create a new project. Guide them through the process co
 
 ## Available Project Types
 
-1. **T3 (Next.js)** - Full-stack TypeScript with Next.js, tRPC, Prisma, Tailwind
-   - Includes: UI kit (shadcn-style), testing (Vitest, Playwright), linting
+1. **Next.js** (default) - Full-stack TypeScript with Next.js, Better Auth, Drizzle, Neon, tRPC, Tailwind
+   - Includes: UI kit (shadcn-style), testing (Vitest, Playwright), linting (Biome)
    - Deploys to: Vercel
+   - `--supabase` flag swaps to Supabase (Auth + Database + Storage) instead
+   - `--provision` flag provisions cloud services via Stripe Projects after scaffolding
 
 2. **Laravel** - PHP with Inertia.js and React
    - Includes: UI kit, testing (Pest, Dusk), linting (Pint, Larastan)
@@ -18,7 +20,7 @@ You are helping the user create a new project. Guide them through the process co
 
 3. **Discovery** - Requirements gathering mode (no stack yet)
    - For planning before you know what tech stack to use
-   - Can be upgraded to T3 or Laravel later
+   - Can be upgraded to Next.js or Laravel later
 
 ## Your Task
 
@@ -32,7 +34,8 @@ You are helping the user create a new project. Guide them through the process co
 Start by asking: "What are you building?"
 
 Based on their answer:
-- If it's a web app with complex frontend → recommend T3
+- If it's a web app with complex frontend → recommend Next.js (default)
+- If they specifically need Supabase → recommend Next.js with `--supabase`
 - If it's a PHP/Laravel shop or simpler CRUD → recommend Laravel
 - If they're unsure what to build → recommend Discovery
 
@@ -41,7 +44,17 @@ Based on their answer:
 Once you know the project name and type, run:
 
 ```bash
-~/code/create-project/bin/scaffold <project-name> --type=<t3|laravel|discovery>
+# Default (Better Auth + Drizzle + Neon)
+~/code/create-project/bin/scaffold <project-name>
+
+# With Supabase instead
+~/code/create-project/bin/scaffold <project-name> --supabase
+
+# With cloud provisioning via Stripe Projects
+~/code/create-project/bin/scaffold <project-name> --provision
+
+# Laravel or Discovery
+~/code/create-project/bin/scaffold <project-name> --type=<laravel|discovery>
 ```
 
 The script will:
@@ -49,6 +62,7 @@ The script will:
 - Install dependencies
 - Set up Claude Code (CLAUDE.md, commands, MCP servers)
 - Set up DevOps (CodeRabbit, GitHub workflows)
+- Provision cloud services if `--provision` is passed (Next.js only)
 - Initialize git
 - Optionally create a GitHub repo
 
@@ -59,7 +73,7 @@ Let the user know:
 - Key files: CLAUDE.md, .coderabbit.yaml
 - Next steps based on stack
 
-For T3: "Run `npm run dev` to start the development server"
+For Next.js: "Run `pnpm dev` to start the development server"
 For Laravel: "Run `php artisan serve` and `npm run dev`"
 For Discovery: "Use `/requirements-start` to begin gathering requirements"
 
