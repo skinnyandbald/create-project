@@ -2,8 +2,14 @@
 <!-- Brief description of what this PR does -->
 
 ## Related Issues
-<!-- Link to GitHub issues this PR addresses -->
-Fixes #
+<!-- GitHub auto-closes the linked issue on merge only when the PR body contains
+     a literal closing keyword. Accepted (case-insensitive, optional colon):
+       Close / Closes / Closed
+       Fix / Fixes / Fixed
+       Resolve / Resolves / Resolved
+     Cross-repo `owner/repo#N` refs do NOT auto-close — they only mention.
+     Replace [ISSUE_NUMBER] with the real number, or CI fails. -->
+Fixes #[ISSUE_NUMBER]
 
 ## Type of Change
 - [ ] Feature (new functionality)

@@ -1,0 +1,33 @@
+name: Require Closing Keyword
+
+on:
+  pull_request:
+    types: [opened, edited, reopened, synchronize, ready_for_review]
+
+permissions:
+  pull-requests: read
+
+jobs:
+  check-closing-keyword:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check PR body for a GitHub closing keyword
+        env:
+          PR_BODY: ${{ github.event.pull_request.body }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          if [ -z "${PR_BODY}" ]; then
+            echo "::error::PR body is empty. Add a closing keyword like 'Closes #123'."
+            exit 1
+          fi
+          # Accepts: Closes/Closed/Close, Fix/Fixes/Fixed, Resolve/Resolves/Resolved
+          # followed by whitespace and either '#N' or 'owner/repo#N'.
+          # Leading '(^|[^[:alnum:]_])' and trailing '\b' enforce word boundaries
+          # so substrings like 'prefixes #123' and 'enclosed #45' don't falsely match.
+          if printf '%s' "${PR_BODY}" \
+            | grep -qiE '(^|[^[:alnum:]_])(close[sd]?|fix(es|ed)?|resolve[sd]?):?[[:space:]]+(#|[A-Za-z0-9._-]+/[A-Za-z0-9._-]+#)[0-9]+\b'; then
+            echo "PR #${PR_NUMBER} body contains a GitHub closing keyword."
+            exit 0
+          fi
+          echo "::error::PR body must include a GitHub closing keyword: 'Closes #N', 'Fixes #N', or 'Resolves #N' (case-insensitive). Without one, merging will NOT auto-close the linked issue."
+          exit 1
