@@ -540,7 +540,7 @@ provision_services() {
 
         local missing=()
         for key in "${required_envs[@]}"; do
-            if ! grep -q "^${key}=" .env 2>/dev/null; then
+            if ! grep -Eq "^${key}=.+" .env 2>/dev/null; then
                 missing+=("$key")
             fi
         done
@@ -654,9 +654,13 @@ main() {
     # Scaffold based on type
     local is_nextjs=false
     case "$project_type" in
-        nextjs|t3|"T3"|"T3 (Next.js)"|"Next.js (Better Auth + Drizzle + Neon + tRPC + Tailwind)"|"Next.js (Supabase + tRPC + Tailwind)")
+        nextjs|t3|"T3"|"T3 (Next.js)"|"Next.js (Better Auth + Drizzle + Neon + tRPC + Tailwind)")
             is_nextjs=true
             scaffold_nextjs "$project_name" "$supabase"
+            ;;
+        "Next.js (Supabase)"|"Next.js (Supabase + tRPC + Tailwind)")
+            is_nextjs=true
+            scaffold_nextjs "$project_name" "true"
             ;;
         laravel|"Laravel")
             scaffold_laravel "$project_name"
