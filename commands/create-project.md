@@ -90,3 +90,5 @@ If the user has a Discovery project and wants to add a stack:
 ```
 
 This preserves the requirements/ folder while adding the full stack.
+
+Note: `--no-security` is not yet honored during `--upgrade` (security scanning is always added).
