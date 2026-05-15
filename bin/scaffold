@@ -481,7 +481,7 @@ provision_services() {
     local failed=()
     for service in "${selected[@]}"; do
         print_step "Provisioning $service..."
-        if stripe projects add "$service" -y --accept-tos 2>/dev/null; then
+        if stripe projects add "$service" -y --accept-tos; then
             succeeded+=("$service")
             print_success "$service provisioned"
         else
@@ -515,8 +515,15 @@ provision_services() {
 
         # Generate local-only env vars that Stripe Projects won't provide
         if [ "$use_supabase" != "true" ]; then
+            # Ensure trailing newline before appending
+            [ -f .env ] && [ -n "$(tail -c 1 .env 2>/dev/null)" ] && echo "" >> .env
+
             if ! grep -q '^BETTER_AUTH_SECRET=' .env 2>/dev/null; then
-                printf 'BETTER_AUTH_SECRET=%s\n' "$(openssl rand -base64 32)" >> .env
+                if command -v openssl &>/dev/null; then
+                    printf 'BETTER_AUTH_SECRET=%s\n' "$(openssl rand -base64 32)" >> .env
+                else
+                    print_warning "openssl not found. Skipping BETTER_AUTH_SECRET generation."
+                fi
             fi
             if ! grep -q '^BETTER_AUTH_URL=' .env 2>/dev/null; then
                 printf 'BETTER_AUTH_URL=http://localhost:3000\n' >> .env
