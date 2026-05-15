@@ -1,30 +1,29 @@
 "use client";
 
 import { useState } from "react";
-import { authClient } from "@/lib/auth/client";
+import { createClient } from "@/lib/supabase/browser";
 
 export default function SignInPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const supabase = createClient();
 
   async function handleSignIn(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
     setIsLoading(true);
-    await authClient.signIn.email(
-      { email, password },
-      {
-        onSuccess: () => {
-          window.location.href = "/dashboard";
-        },
-        onError: (ctx) => {
-          setError(ctx.error.message);
-          setIsLoading(false);
-        },
-      },
-    );
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+    if (error) {
+      setError(error.message);
+      setIsLoading(false);
+    } else {
+      window.location.href = "/dashboard";
+    }
   }
 
   return (

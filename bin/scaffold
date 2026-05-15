@@ -18,6 +18,7 @@ while [ -L "$SCRIPT_PATH" ]; do
 done
 SCRIPT_DIR="$(cd -P "$(dirname "$SCRIPT_PATH")" && pwd)"
 SCAFFOLDS_DIR="$(dirname "$SCRIPT_DIR")/scaffolds"
+SHARED_DIR="$SCAFFOLDS_DIR/shared"
 
 # Load config for PROJECT_DIR
 CONFIG_FILE="$HOME/.config/scaffold/config"
@@ -164,6 +165,7 @@ check_existing_project() {
 scaffold_nextjs() {
     local project_name="$1"
     local use_supabase="${2:-false}"
+    local no_security="${3:-false}"
     local TARGET_DIR="$PROJECT_DIR/$project_name"
 
     # Safety trap
@@ -175,21 +177,18 @@ scaffold_nextjs() {
         exit 1
     fi
 
-    # 1. Copy base template (Supabase)
+    # 1. Copy base template (Better Auth + Drizzle + Neon)
     print_step "Creating Next.js project..."
     cp -r "$SCAFFOLDS_DIR/nextjs/template" "$TARGET_DIR"
 
-    # 2. Default: apply composable overlay (Better Auth + Drizzle + Neon)
-    #    --supabase: skip overlay, keep Supabase as-is
-    if [ "$use_supabase" != "true" ]; then
-        print_step "Applying default stack (Better Auth + Drizzle + Neon)..."
-        if [ -d "$SCAFFOLDS_DIR/nextjs/composable" ] && [ "$(ls -A "$SCAFFOLDS_DIR/nextjs/composable")" ]; then
-            cp -r "$SCAFFOLDS_DIR/nextjs/composable/"* "$TARGET_DIR/"
-        fi
-        rm -rf "$TARGET_DIR/src/lib/supabase"
-        rm -rf "$TARGET_DIR/src/app/(auth)/callback"
-    else
-        print_step "Using Supabase variant..."
+    # 2. --supabase: apply Supabase overlay and remove composable-specific files
+    if [ "$use_supabase" = "true" ]; then
+        print_step "Applying Supabase variant..."
+        cp -r "$SCAFFOLDS_DIR/nextjs/supabase/"* "$TARGET_DIR/"
+        rm -rf "$TARGET_DIR/src/lib/auth"
+        rm -rf "$TARGET_DIR/src/lib/db"
+        rm -rf "$TARGET_DIR/src/app/api/auth"
+        rm -f "$TARGET_DIR/drizzle.config.ts"
     fi
 
     # 3. Claude configs
@@ -210,7 +209,13 @@ scaffold_nextjs() {
         cp "$SCAFFOLDS_DIR/nextjs/devops/PULL_REQUEST_TEMPLATE.md" "$TARGET_DIR/.github/"
     fi
 
-    # 5. String replace (allowlisted extensions only)
+    # 5. Security scanning
+    if [ "$no_security" != "true" ] && [ -d "$SHARED_DIR/security" ]; then
+        print_step "Adding security scanning workflow..."
+        cp "$SHARED_DIR/security/.github/workflows/security.yml" "$TARGET_DIR/.github/workflows/"
+    fi
+
+    # 7. String replace (allowlisted extensions only)
     print_step "Configuring project name..."
     find "$TARGET_DIR" -type f \( \
         -name "*.ts" -o -name "*.tsx" -o -name "*.json" -o \
@@ -218,7 +223,7 @@ scaffold_nextjs() {
         -name "*.css" -o -name ".env.example" \
     \) -exec perl -pi -e "s/{{PROJECT_NAME}}/$project_name/g" {} +
 
-    # 6. Install & Git Hooks
+    # 8. Install & Git Hooks
     print_step "Initializing git repository..."
     cd "$TARGET_DIR"
     git init
@@ -229,7 +234,7 @@ scaffold_nextjs() {
     print_step "Installing dependencies with pnpm..."
     pnpm install
 
-    # 8. Success — remove trap
+    # 9. Success — remove trap
     trap - ERR INT TERM
     print_success "Next.js project created at $TARGET_DIR"
 }
@@ -242,6 +247,7 @@ scaffold_t3() {
 # Scaffold Laravel project
 scaffold_laravel() {
     local project_name="$1"
+    local no_security="${2:-false}"
     local project_path="$PROJECT_DIR/$project_name"
 
     print_step "Creating Laravel project..."
@@ -281,6 +287,12 @@ scaffold_laravel() {
     cp "$SCAFFOLDS_DIR/laravel/devops/coderabbit.yaml" .coderabbit.yaml
     cp "$SCAFFOLDS_DIR/laravel/devops/workflows/"*.yml .github/workflows/
     cp "$SCAFFOLDS_DIR/laravel/devops/PULL_REQUEST_TEMPLATE.md" .github/
+
+    # Security scanning
+    if [ "$no_security" != "true" ] && [ -d "$SHARED_DIR/security" ]; then
+        print_step "Adding security scanning workflow..."
+        cp "$SHARED_DIR/security/.github/workflows/security.yml" "$project_path/.github/workflows/"
+    fi
 
     print_success "Laravel project created!"
 }
@@ -568,6 +580,7 @@ main() {
     local upgrade_mode=false
     local supabase=false
     local provision=false
+    local no_security=false
 
     # Parse arguments
     while [[ $# -gt 0 ]]; do
@@ -586,6 +599,10 @@ main() {
                 ;;
             --provision)
                 provision=true
+                shift
+                ;;
+            --no-security)
+                no_security=true
                 shift
                 ;;
             --upgrade)
@@ -651,19 +668,33 @@ main() {
         project_type=$(select_option "Select project type:" "Next.js (Better Auth + Drizzle + Neon + tRPC + Tailwind)" "Laravel" "Discovery")
     fi
 
+    # Security scanning prompt (default yes, skip for Discovery and non-TTY)
+    if [ "$no_security" != "true" ]; then
+        case "$project_type" in
+            discovery|"Discovery") ;;
+            *)
+                if [ -t 0 ]; then
+                    if ! confirm "Add security scanning (Semgrep + Trivy + Gitleaks)?" "y"; then
+                        no_security=true
+                    fi
+                fi
+                ;;
+        esac
+    fi
+
     # Scaffold based on type
     local is_nextjs=false
     case "$project_type" in
         nextjs|t3|"T3"|"T3 (Next.js)"|"Next.js (Better Auth + Drizzle + Neon + tRPC + Tailwind)")
             is_nextjs=true
-            scaffold_nextjs "$project_name" "$supabase"
+            scaffold_nextjs "$project_name" "$supabase" "$no_security"
             ;;
         "Next.js (Supabase)"|"Next.js (Supabase + tRPC + Tailwind)")
             is_nextjs=true
-            scaffold_nextjs "$project_name" "true"
+            scaffold_nextjs "$project_name" "true" "$no_security"
             ;;
         laravel|"Laravel")
-            scaffold_laravel "$project_name"
+            scaffold_laravel "$project_name" "$no_security"
             ;;
         discovery|"Discovery")
             scaffold_discovery "$project_name"
