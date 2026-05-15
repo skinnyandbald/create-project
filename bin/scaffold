@@ -404,6 +404,10 @@ init_git() {
     if [ ! -d .git ]; then
         print_step "Initializing git repository..."
         git init
+    fi
+
+    # Create initial commit if repo has no commits yet
+    if ! git rev-parse HEAD &>/dev/null; then
         git add .
         git commit -m "feat: initial scaffold
 
