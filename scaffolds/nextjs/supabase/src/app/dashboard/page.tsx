@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { redirect } from "next/navigation";
 
 export const dynamic = "force-dynamic";
 
@@ -9,14 +10,14 @@ export default async function DashboardPage() {
     error,
   } = await supabase.auth.getUser();
 
-  if (error) {
-    console.error("Failed to get user:", error.message);
+  if (error || !user) {
+    redirect("/sign-in");
   }
 
   return (
     <div className="p-8">
       <h1 className="text-2xl font-bold">Dashboard</h1>
-      <p className="mt-2">Welcome, {user?.email}</p>
+      <p className="mt-2">Welcome, {user.email}</p>
     </div>
   );
 }

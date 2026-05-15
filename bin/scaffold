@@ -184,7 +184,7 @@ scaffold_nextjs() {
     # 2. --supabase: apply Supabase overlay and remove composable-specific files
     if [ "$use_supabase" = "true" ]; then
         print_step "Applying Supabase variant..."
-        cp -r "$SCAFFOLDS_DIR/nextjs/supabase/"* "$TARGET_DIR/"
+        cp -a "$SCAFFOLDS_DIR/nextjs/supabase/." "$TARGET_DIR/"
         rm -rf "$TARGET_DIR/src/lib/auth"
         rm -rf "$TARGET_DIR/src/lib/db"
         rm -rf "$TARGET_DIR/src/app/api/auth"
@@ -210,12 +210,18 @@ scaffold_nextjs() {
     fi
 
     # 5. Security scanning
-    if [ "$no_security" != "true" ] && [ -d "$SHARED_DIR/security" ]; then
-        print_step "Adding security scanning workflow..."
-        cp "$SHARED_DIR/security/.github/workflows/security.yml" "$TARGET_DIR/.github/workflows/"
+    if [ "$no_security" != "true" ]; then
+        local security_workflow="$SHARED_DIR/security/.github/workflows/security.yml"
+        if [ -f "$security_workflow" ]; then
+            print_step "Adding security scanning workflow..."
+            cp "$security_workflow" "$TARGET_DIR/.github/workflows/"
+        else
+            print_error "Security workflow missing: $security_workflow"
+            exit 1
+        fi
     fi
 
-    # 7. String replace (allowlisted extensions only)
+    # 6. String replace (allowlisted extensions only)
     print_step "Configuring project name..."
     find "$TARGET_DIR" -type f \( \
         -name "*.ts" -o -name "*.tsx" -o -name "*.json" -o \
@@ -289,9 +295,15 @@ scaffold_laravel() {
     cp "$SCAFFOLDS_DIR/laravel/devops/PULL_REQUEST_TEMPLATE.md" .github/
 
     # Security scanning
-    if [ "$no_security" != "true" ] && [ -d "$SHARED_DIR/security" ]; then
-        print_step "Adding security scanning workflow..."
-        cp "$SHARED_DIR/security/.github/workflows/security.yml" "$project_path/.github/workflows/"
+    if [ "$no_security" != "true" ]; then
+        local security_workflow="$SHARED_DIR/security/.github/workflows/security.yml"
+        if [ -f "$security_workflow" ]; then
+            print_step "Adding security scanning workflow..."
+            cp "$security_workflow" "$project_path/.github/workflows/"
+        else
+            print_error "Security workflow missing: $security_workflow"
+            exit 1
+        fi
     fi
 
     print_success "Laravel project created!"

@@ -9,13 +9,17 @@ export default function SignUpPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const supabase = createClient();
 
   async function handleSignUp(e: React.FormEvent) {
     e.preventDefault();
+    setError(null);
+    setIsLoading(true);
     const { error } = await supabase.auth.signUp({ email, password });
     if (error) {
       setError(error.message);
+      setIsLoading(false);
     } else {
       setSuccess(true);
     }
@@ -58,9 +62,10 @@ export default function SignUpPage() {
         />
         <button
           type="submit"
-          className="w-full rounded bg-foreground py-2 font-medium text-background"
+          disabled={isLoading}
+          className="w-full rounded bg-foreground py-2 font-medium text-background disabled:opacity-50"
         >
-          Sign Up
+          {isLoading ? "Signing up…" : "Sign Up"}
         </button>
         <p className="text-center text-sm">
           Already have an account?{" "}

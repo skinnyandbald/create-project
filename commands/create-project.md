@@ -65,7 +65,7 @@ The script will:
 - Install dependencies
 - Set up Claude Code (CLAUDE.md, commands, MCP servers)
 - Set up DevOps (CodeRabbit, GitHub workflows)
-- Add security scanning (Semgrep + Trivy + Gitleaks) unless `--no-security`
+- Add security scanning (Semgrep + Trivy + Gitleaks) for Next.js/Laravel unless `--no-security`
 - Provision cloud services if `--provision` is passed (Next.js only)
 - Initialize git
 - Optionally create a GitHub repo
