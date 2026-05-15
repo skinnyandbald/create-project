@@ -43,6 +43,9 @@ scaffold my-app --supabase
 # Next.js + provision cloud services via Stripe Projects
 scaffold my-app --provision
 
+# Skip security scanning workflow
+scaffold my-app --no-security
+
 # Laravel
 scaffold my-app --type=laravel
 
@@ -120,6 +123,17 @@ Interactively confirms each service before provisioning. Syncs credentials to `.
 Requires: Stripe CLI (`brew install stripe/stripe-cli/stripe`) with the projects plugin (`stripe plugin install projects`). You must be logged in (`stripe login`).
 
 **Note:** This provisions real cloud accounts. Some services may incur costs.
+
+### Security Scanning
+
+All Next.js and Laravel projects include a security scanning GitHub Actions workflow by default:
+- **Semgrep** (SAST) - static analysis for vulnerabilities
+- **Trivy** (SCA) - dependency vulnerability scanning
+- **Gitleaks** - secret detection
+
+Uses a SHA-pinned reusable workflow from `github-defaults`. Runs on push to main, PRs, and weekly.
+
+Skip with `--no-security` or decline the interactive prompt.
 
 ### Laravel Projects
 - Laravel + Breeze with React/Inertia

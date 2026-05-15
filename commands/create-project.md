@@ -53,6 +53,9 @@ Once you know the project name and type, run:
 # With cloud provisioning via Stripe Projects
 ~/code/create-project/bin/scaffold <project-name> --provision
 
+# Skip security scanning
+~/code/create-project/bin/scaffold <project-name> --no-security
+
 # Laravel or Discovery
 ~/code/create-project/bin/scaffold <project-name> --type=<laravel|discovery>
 ```
@@ -62,6 +65,7 @@ The script will:
 - Install dependencies
 - Set up Claude Code (CLAUDE.md, commands, MCP servers)
 - Set up DevOps (CodeRabbit, GitHub workflows)
+- Add security scanning (Semgrep + Trivy + Gitleaks) for Next.js/Laravel unless `--no-security`
 - Provision cloud services if `--provision` is passed (Next.js only)
 - Initialize git
 - Optionally create a GitHub repo
@@ -86,3 +90,5 @@ If the user has a Discovery project and wants to add a stack:
 ```
 
 This preserves the requirements/ folder while adding the full stack.
+
+Note: `--no-security` is not yet honored during `--upgrade` (security scanning is always added).
