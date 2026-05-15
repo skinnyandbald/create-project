@@ -163,7 +163,7 @@ check_existing_project() {
 # Scaffold Next.js project
 scaffold_nextjs() {
     local project_name="$1"
-    local composable="${2:-false}"
+    local use_supabase="${2:-false}"
     local TARGET_DIR="$PROJECT_DIR/$project_name"
 
     # Safety trap
@@ -175,19 +175,21 @@ scaffold_nextjs() {
         exit 1
     fi
 
-    # 1. Copy template
+    # 1. Copy base template (Supabase)
     print_step "Creating Next.js project..."
     cp -r "$SCAFFOLDS_DIR/nextjs/template" "$TARGET_DIR"
 
-    # 2. Composable overlay
-    if [ "$composable" = "true" ]; then
-        print_step "Applying composable variant (Better Auth + Drizzle + Neon)..."
+    # 2. Default: apply composable overlay (Better Auth + Drizzle + Neon)
+    #    --supabase: skip overlay, keep Supabase as-is
+    if [ "$use_supabase" != "true" ]; then
+        print_step "Applying default stack (Better Auth + Drizzle + Neon)..."
         if [ -d "$SCAFFOLDS_DIR/nextjs/composable" ] && [ "$(ls -A "$SCAFFOLDS_DIR/nextjs/composable")" ]; then
             cp -r "$SCAFFOLDS_DIR/nextjs/composable/"* "$TARGET_DIR/"
         fi
-        # Remove Supabase-specific files that the composable variant replaces
         rm -rf "$TARGET_DIR/src/lib/supabase"
         rm -rf "$TARGET_DIR/src/app/(auth)/callback"
+    else
+        print_step "Using Supabase variant..."
     fi
 
     # 3. Claude configs
@@ -327,7 +329,7 @@ upgrade_project() {
     print_header "Upgrading $project_name"
 
     local stack
-    stack=$(select_option "Select stack:" "Next.js (Supabase + tRPC + Tailwind)" "Laravel")
+    stack=$(select_option "Select stack:" "Next.js (Better Auth + Drizzle + Neon + tRPC + Tailwind)" "Next.js (Supabase)" "Laravel")
 
     # Backup the ENTIRE project, not just requirements
     print_step "Backing up existing project..."
@@ -342,8 +344,11 @@ upgrade_project() {
 
     # Create new project
     case "$stack" in
-        "Next.js (Supabase + tRPC + Tailwind)")
-            scaffold_nextjs "$project_name"
+        "Next.js (Better Auth + Drizzle + Neon + tRPC + Tailwind)")
+            scaffold_nextjs "$project_name" "false"
+            ;;
+        "Next.js (Supabase)")
+            scaffold_nextjs "$project_name" "true"
             ;;
         "Laravel")
             scaffold_laravel "$project_name"
@@ -405,6 +410,148 @@ Created with create-project scaffold tool"
     fi
 }
 
+# Provision cloud services via Stripe Projects
+provision_services() {
+    local project_name="$1"
+    local use_supabase="${2:-false}"
+    local target_dir="$PROJECT_DIR/$project_name"
+
+    # Require interactive terminal
+    if [[ ! -t 0 ]]; then
+        print_warning "--provision requires an interactive terminal. Skipping."
+        return 0
+    fi
+
+    # Check stripe CLI
+    if ! command -v stripe &>/dev/null; then
+        print_warning "Stripe CLI not installed. Skipping provisioning."
+        print_warning "Install: brew install stripe/stripe-cli/stripe && stripe plugin install projects"
+        return 0
+    fi
+
+    # Auth + plugin check via catalog (side-effect-free)
+    if ! stripe projects catalog >/dev/null 2>&1; then
+        print_warning "Stripe Projects unavailable or not logged in."
+        print_warning "Run: stripe login && stripe plugin install projects"
+        return 0
+    fi
+
+    print_header "Provision Cloud Services"
+    echo -e "${YELLOW}Note: This provisions real cloud accounts. Some services may incur costs.${NC}\n"
+
+    # Build service list based on scaffold type
+    local services=()
+    local display_names=()
+    local defaults=()
+
+    if [ "$use_supabase" = "true" ]; then
+        services=("supabase/project" "vercel/project" "sentry/project" "posthog/analytics")
+        display_names=("Supabase (database + auth + storage)" "Vercel (hosting)" "Sentry (error tracking)" "PostHog (analytics)")
+    else
+        services=("neon/postgres" "vercel/project" "sentry/project" "posthog/analytics")
+        display_names=("Neon (serverless Postgres)" "Vercel (hosting)" "Sentry (error tracking)" "PostHog (analytics)")
+    fi
+    defaults=("y" "y" "n" "n")
+
+    # Interactive per-service confirmation
+    local selected=()
+    for i in "${!services[@]}"; do
+        if confirm "  ${display_names[$i]}" "${defaults[$i]}"; then
+            selected+=("${services[$i]}")
+        fi
+    done
+
+    if [ "${#selected[@]}" -eq 0 ]; then
+        print_step "No services selected. Skipping provisioning."
+        return 0
+    fi
+
+    # Initialize Stripe Projects
+    pushd "$target_dir" >/dev/null || return 1
+    trap 'popd >/dev/null 2>&1 || true' RETURN
+
+    print_step "Initializing Stripe Projects..."
+    if ! stripe projects init "$project_name" -y; then
+        print_warning "stripe projects init failed. Run manually: stripe projects init $project_name"
+        return 0
+    fi
+
+    # Add each selected service
+    local succeeded=()
+    local failed=()
+    for service in "${selected[@]}"; do
+        print_step "Provisioning $service..."
+        if stripe projects add "$service" -y --accept-tos 2>/dev/null; then
+            succeeded+=("$service")
+            print_success "$service provisioned"
+        else
+            failed+=("$service")
+            print_warning "Failed to provision $service"
+        fi
+    done
+
+    # Report failures
+    if [ "${#failed[@]}" -gt 0 ]; then
+        echo ""
+        print_warning "Failed services (add manually):"
+        for service in "${failed[@]}"; do
+            echo "  stripe projects add $service"
+        done
+    fi
+
+    # Sync credentials if any services succeeded
+    if [ "${#succeeded[@]}" -gt 0 ]; then
+        # Back up existing .env
+        if [ -f .env ]; then
+            cp .env ".env.backup.$(date +%Y%m%d%H%M%S)"
+        fi
+
+        print_step "Syncing credentials to .env..."
+        if stripe projects env -y 2>/dev/null; then
+            print_success "Credentials synced to .env"
+        else
+            print_warning "Failed to sync credentials. Run manually: stripe projects env"
+        fi
+
+        # Generate local-only env vars that Stripe Projects won't provide
+        if [ "$use_supabase" != "true" ]; then
+            if ! grep -q '^BETTER_AUTH_SECRET=' .env 2>/dev/null; then
+                printf 'BETTER_AUTH_SECRET=%s\n' "$(openssl rand -base64 32)" >> .env
+            fi
+            if ! grep -q '^BETTER_AUTH_URL=' .env 2>/dev/null; then
+                printf 'BETTER_AUTH_URL=http://localhost:3000\n' >> .env
+            fi
+        fi
+
+        # Validate required env vars are present
+        local required_envs=()
+        if [ "$use_supabase" = "true" ]; then
+            required_envs=("NEXT_PUBLIC_SUPABASE_URL" "NEXT_PUBLIC_SUPABASE_ANON_KEY")
+        else
+            required_envs=("DATABASE_URL" "BETTER_AUTH_SECRET" "BETTER_AUTH_URL")
+        fi
+
+        local missing=()
+        for key in "${required_envs[@]}"; do
+            if ! grep -q "^${key}=" .env 2>/dev/null; then
+                missing+=("$key")
+            fi
+        done
+
+        if [ "${#missing[@]}" -gt 0 ]; then
+            echo ""
+            print_warning "Missing env vars (set manually in .env):"
+            for key in "${missing[@]}"; do
+                echo "  $key"
+            done
+        fi
+    else
+        print_warning "No services provisioned. Skipping credential sync."
+    fi
+
+    echo ""
+}
+
 # Main function
 main() {
     print_header "Create Project"
@@ -412,7 +559,8 @@ main() {
     local project_name=""
     local project_type=""
     local upgrade_mode=false
-    local composable=false
+    local supabase=false
+    local provision=false
 
     # Parse arguments
     while [[ $# -gt 0 ]]; do
@@ -421,8 +569,16 @@ main() {
                 project_type="${1#*=}"
                 shift
                 ;;
+            --supabase)
+                supabase=true
+                shift
+                ;;
             --composable)
-                composable=true
+                print_warning "Composable is now the default. The --composable flag is no longer needed." >&2
+                shift
+                ;;
+            --provision)
+                provision=true
                 shift
                 ;;
             --upgrade)
@@ -485,13 +641,15 @@ main() {
 
     # Get project type if not provided
     if [ -z "$project_type" ]; then
-        project_type=$(select_option "Select project type:" "Next.js (Supabase + tRPC + Tailwind)" "Laravel" "Discovery")
+        project_type=$(select_option "Select project type:" "Next.js (Better Auth + Drizzle + Neon + tRPC + Tailwind)" "Laravel" "Discovery")
     fi
 
     # Scaffold based on type
+    local is_nextjs=false
     case "$project_type" in
-        nextjs|t3|"T3"|"T3 (Next.js)"|"Next.js (Supabase + tRPC + Tailwind)")
-            scaffold_nextjs "$project_name" "$composable"
+        nextjs|t3|"T3"|"T3 (Next.js)"|"Next.js (Better Auth + Drizzle + Neon + tRPC + Tailwind)"|"Next.js (Supabase + tRPC + Tailwind)")
+            is_nextjs=true
+            scaffold_nextjs "$project_name" "$supabase"
             ;;
         laravel|"Laravel")
             scaffold_laravel "$project_name"
@@ -504,6 +662,13 @@ main() {
             exit 1
             ;;
     esac
+
+    # Provision cloud services (Next.js only)
+    if $provision && $is_nextjs; then
+        provision_services "$project_name" "$supabase"
+    elif $provision; then
+        print_warning "--provision is currently only supported for Next.js projects."
+    fi
 
     # Git setup
     init_git "$project_name"
