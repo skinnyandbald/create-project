@@ -26,7 +26,7 @@ fi
 # uncommitted WIP) would block commits from every worktree.
 CWD=$(echo "$INPUT" | jq -r '.cwd // empty')
 PROJECT_DIR="${CWD:-$CLAUDE_PROJECT_DIR}"
-PROJECT_DIR=$(cd "$PROJECT_DIR" 2>/dev/null && git rev-parse --show-toplevel 2>/dev/null || echo "$PROJECT_DIR")
+PROJECT_DIR=$(cd -- "$PROJECT_DIR" >/dev/null 2>&1 && git rev-parse --show-toplevel 2>/dev/null || printf '%s\n' "$PROJECT_DIR")
 
 # Run typecheck
 OUTPUT=$(cd "$PROJECT_DIR" && npx tsc --noEmit 2>&1)
