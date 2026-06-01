@@ -197,6 +197,9 @@ scaffold_nextjs() {
     cp -r "$SCAFFOLDS_DIR/nextjs/claude/"* "$TARGET_DIR/.claude/"
     # Move CLAUDE.md to project root
     mv "$TARGET_DIR/.claude/CLAUDE.md" "$TARGET_DIR/CLAUDE.md"
+    # Project-scoped MCP config must live at the repo root as .mcp.json
+    # (Claude Code does not read .claude/mcp.json) — see code.claude.com/docs/en/mcp
+    mv "$TARGET_DIR/.claude/mcp.json" "$TARGET_DIR/.mcp.json"
     find "$TARGET_DIR/.claude/hooks" -name "*.sh" -exec chmod +x {} + 2>/dev/null
 
     # 4. DevOps
@@ -278,13 +281,22 @@ scaffold_laravel() {
     composer require laravel/dusk --dev
     composer require larastan/larastan --dev
 
+    # Install Laravel Boost so the `php artisan boost:mcp` command (registered
+    # as the laravel-ai-boost MCP server in .mcp.json) is available. We register
+    # the MCP server manually in .mcp.json rather than running the interactive
+    # `boost:install`, which would prompt and regenerate its own .mcp.json/CLAUDE.md.
+    print_step "Installing Laravel Boost..."
+    composer require laravel/boost --dev
+
     # Copy Claude setup
     print_step "Setting up Claude Code..."
     mkdir -p .claude/commands
     cp "$SCAFFOLDS_DIR/laravel/CLAUDE.md" ./CLAUDE.md
     perl -pi -e "s/{{PROJECT_NAME}}/$project_name/g" ./CLAUDE.md
     cp "$SCAFFOLDS_DIR/laravel/settings.json" .claude/settings.json
-    cp "$SCAFFOLDS_DIR/laravel/mcp.json" .claude/mcp.json
+    # Project-scoped MCP config must live at the repo root as .mcp.json
+    # (Claude Code does not read .claude/mcp.json) — see code.claude.com/docs/en/mcp
+    cp "$SCAFFOLDS_DIR/laravel/mcp.json" .mcp.json
     cp "$SCAFFOLDS_DIR/laravel/claudeignore" .claudeignore
 
     # Copy devops

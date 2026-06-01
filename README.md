@@ -79,7 +79,7 @@ In any Claude Code session:
 ### All Projects
 - `CLAUDE.md` - Claude Code instructions
 - `.claude/settings.json` - Permissions
-- `.claude/mcp.json` - MCP servers (Context7, Figma)
+- `.mcp.json` - MCP servers (CodeScene, Context7, Figma)
 - `.coderabbit.yaml` - PR review config
 - `.github/workflows/` - Claude GitHub Actions
 - `.claudeignore` - Protect secrets from Claude

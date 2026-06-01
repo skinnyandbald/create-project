@@ -16,6 +16,10 @@
       "env": {
         "FIGMA_API_KEY": "${FIGMA_API_KEY}"
       }
+    },
+    "laravel-ai-boost": {
+      "command": "php",
+      "args": ["artisan", "boost:mcp"]
     }
   }
 }

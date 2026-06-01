@@ -30,6 +30,7 @@
     "jsdom": "^26.0.0",
     "lint-staged": "^16.4.0",
     "typescript": "^6.0.0",
+    "@vitest/coverage-v8": "^3.1.0",
     "vitest": "^3.1.0"
   },
   "lint-staged": {
@@ -43,6 +44,7 @@
     "typecheck": "tsc --noEmit",
     "lint": "biome check",
     "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
     "test:watch": "vitest",
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio"
