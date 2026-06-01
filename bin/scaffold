@@ -281,6 +281,13 @@ scaffold_laravel() {
     composer require laravel/dusk --dev
     composer require larastan/larastan --dev
 
+    # Install Laravel Boost so the `php artisan boost:mcp` command (registered
+    # as the laravel-ai-boost MCP server in .mcp.json) is available. We register
+    # the MCP server manually in .mcp.json rather than running the interactive
+    # `boost:install`, which would prompt and regenerate its own .mcp.json/CLAUDE.md.
+    print_step "Installing Laravel Boost..."
+    composer require laravel/boost --dev
+
     # Copy Claude setup
     print_step "Setting up Claude Code..."
     mkdir -p .claude/commands
