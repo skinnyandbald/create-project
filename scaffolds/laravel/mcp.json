@@ -10,13 +10,6 @@
       "command": "npx",
       "args": ["-y", "@upstash/context7-mcp@2.1.4"]
     },
-    "figma": {
-      "command": "npx",
-      "args": ["-y", "figma-developer-mcp@0.8.0", "--stdio"],
-      "env": {
-        "FIGMA_API_KEY": "${FIGMA_API_KEY}"
-      }
-    },
     "laravel-ai-boost": {
       "command": "php",
       "args": ["artisan", "boost:mcp"]
