@@ -8,8 +8,12 @@ on:
 jobs:
   ci:
     runs-on: ubuntu-latest
+    env:
+      CS_ACCESS_TOKEN: ${{ secrets.CODESCENE_API_TOKEN }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # full history for CodeScene cs-coverage merge-base detection
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
@@ -18,5 +22,27 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm typecheck
       - run: pnpm lint
-      - run: pnpm test
+      - run: pnpm test:coverage
       - run: pnpm build
+      # --- CodeScene Code Coverage gate ---
+      # No-ops until this repo is onboarded to CodeScene. To enable: create the
+      # project at https://codescene.io, then add repo secret CODESCENE_API_TOKEN
+      # (+ a CS_PROJECT_URL repo variable for the PR gate).
+      - name: Upload baseline coverage to CodeScene
+        if: ${{ env.CS_ACCESS_TOKEN != '' && github.event_name == 'push' }}
+        run: |
+          set -euo pipefail
+          curl -fsSL https://downloads.codescene.io/enterprise/cli/install-cs-coverage-tool.sh -o /tmp/install-cs.sh
+          bash /tmp/install-cs.sh -y
+          export PATH="$HOME/.local/bin:$PATH"
+          cs-coverage upload --format lcov --metric line-coverage coverage/lcov.info
+      - name: Check coverage gates on PR
+        if: ${{ env.CS_ACCESS_TOKEN != '' && vars.CS_PROJECT_URL != '' && github.event_name == 'pull_request' }}
+        env:
+          CS_PROJECT_URL: ${{ vars.CS_PROJECT_URL }}
+        run: |
+          set -euo pipefail
+          curl -fsSL https://downloads.codescene.io/enterprise/cli/install-cs-coverage-tool.sh -o /tmp/install-cs.sh
+          bash /tmp/install-cs.sh -y
+          export PATH="$HOME/.local/bin:$PATH"
+          cs-coverage check --coverage-files "coverage/lcov.info"

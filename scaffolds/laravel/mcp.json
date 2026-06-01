@@ -8,14 +8,18 @@
     },
     "context7": {
       "command": "npx",
-      "args": ["-y", "@upstash/context7-mcp@2.1.4"]
+      "args": ["-y", "@context7/mcp"]
     },
     "figma": {
       "command": "npx",
-      "args": ["-y", "figma-developer-mcp@0.8.0", "--stdio"],
+      "args": ["-y", "figma-developer-mcp", "--stdio"],
       "env": {
         "FIGMA_API_KEY": "${FIGMA_API_KEY}"
       }
+    },
+    "laravel-ai-boost": {
+      "command": "npx",
+      "args": ["-y", "@anthropic/laravel-boost-mcp"]
     }
   }
 }
